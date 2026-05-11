@@ -1,0 +1,54 @@
+[gd_scene format=3 uid="uid://8pk3vu6yjyv5"]
+
+[ext_resource type="Script" uid="uid://dbuxe6uhimk3n" path="res://Scripts/cardmanager.gd" id="1_kdtpo"]
+[ext_resource type="Script" uid="uid://dqrxw5s456nmh" path="res://Scripts/card_1.gd" id="2_q6ap7"]
+[ext_resource type="Script" uid="uid://brcvo2xm38jus" path="res://Scripts/card_2.gd" id="3_4cb7i"]
+[ext_resource type="Script" uid="uid://bfaku7l52wlsk" path="res://Scripts/card_3.gd" id="4_ickqw"]
+[ext_resource type="Script" uid="uid://brunig41bbn6s" path="res://Scripts/card_4.gd" id="5_f0cox"]
+[ext_resource type="Script" uid="uid://b852ffeglr543" path="res://Scripts/card_5.gd" id="6_uck3m"]
+[ext_resource type="Texture2D" uid="uid://hr3v651kqfuh" path="res://Assets/beta1.png" id="7_q6ap7"]
+
+[node name="Node2D" type="Node2D" unique_id=435446635]
+script = ExtResource("1_kdtpo")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1342739740]
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer" unique_id=1854428507]
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("7_q6ap7")
+
+[node name="Card1" type="Area2D" parent="." unique_id=1494765932]
+script = ExtResource("2_q6ap7")
+
+[node name="Sprite2D" type="Sprite2D" parent="Card1" unique_id=1129481983]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Card1" unique_id=1063041874]
+
+[node name="Card2" type="Area2D" parent="." unique_id=204976510]
+script = ExtResource("3_4cb7i")
+
+[node name="Sprite2D" type="Sprite2D" parent="Card2" unique_id=1012809895]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Card2" unique_id=345945513]
+
+[node name="Card3" type="Area2D" parent="." unique_id=1103039305]
+script = ExtResource("4_ickqw")
+
+[node name="Sprite2D" type="Sprite2D" parent="Card3" unique_id=97762355]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Card3" unique_id=171606279]
+
+[node name="Card4" type="Area2D" parent="." unique_id=861497458]
+script = ExtResource("5_f0cox")
+
+[node name="Sprite2D" type="Sprite2D" parent="Card4" unique_id=2015755306]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Card4" unique_id=1953203663]
+
+[node name="Card5" type="Area2D" parent="." unique_id=1207870763]
+script = ExtResource("6_uck3m")
+
+[node name="Sprite2D" type="Sprite2D" parent="Card5" unique_id=1913705684]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Card5" unique_id=1665754688]
