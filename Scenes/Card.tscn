@@ -1,0 +1,38 @@
+[gd_scene format=3 uid="uid://ckontv23rl71h"]
+
+[ext_resource type="Texture2D" uid="uid://dkfq7arrasinv" path="res://Assets/card_placeholder.png" id="1_dd2wi"]
+[ext_resource type="Script" uid="uid://ceh6bjt1cthey" path="res://Scripts/Card.gd" id="1_hael8"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hael8"]
+size = Vector2(150, 200)
+
+[node name="Card" type="Node2D" unique_id=538932331]
+position = Vector2(150, 890)
+script = ExtResource("1_hael8")
+
+[node name="CardImage" type="Sprite2D" parent="." unique_id=1429810445]
+texture = ExtResource("1_dd2wi")
+
+[node name="Area2D" type="Area2D" parent="." unique_id=1180995550]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=1213194820]
+shape = SubResource("RectangleShape2D_hael8")
+
+[node name="Value" type="RichTextLabel" parent="." unique_id=1449511136]
+modulate = Color(0, 0, 0, 1)
+offset_left = 43.0
+offset_top = -93.0
+offset_right = 83.0
+offset_bottom = -53.0
+text = "0"
+
+[node name="Action" type="RichTextLabel" parent="." unique_id=2107465559]
+modulate = Color(0, 0, 0, 1)
+offset_left = -62.0
+offset_top = 59.0
+offset_right = 56.0
+offset_bottom = 99.0
+text = "Ataque"
+
+[connection signal="mouse_entered" from="Area2D" to="." method="_on_area_2d_mouse_entered"]
+[connection signal="mouse_exited" from="Area2D" to="." method="_on_area_2d_mouse_exited"]

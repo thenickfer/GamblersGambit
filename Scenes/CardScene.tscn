@@ -1,0 +1,85 @@
+[gd_scene format=3 uid="uid://bt4qsmdyo261b"]
+
+[ext_resource type="Script" uid="uid://b0udr3vhtrt4x" path="res://Scripts/card_manager.gd" id="2_3wmv5"]
+[ext_resource type="Texture2D" uid="uid://e4ysn5wfq54" path="res://Assets/deck_placeholder.png" id="4_kkp5k"]
+[ext_resource type="Script" uid="uid://c5xds8gd2ov3l" path="res://Scripts/deck.gd" id="4_qnx4h"]
+[ext_resource type="PackedScene" uid="uid://chrbko46y0tm" path="res://Scenes/CardSlot.tscn" id="5_42vr3"]
+[ext_resource type="Script" uid="uid://5gkydk20d3wg" path="res://Scripts/player_hand.gd" id="5_kdtpo"]
+[ext_resource type="Script" uid="uid://6f1h2c834lxb" path="res://Scripts/input_manager.gd" id="6_kiwwe"]
+
+[sub_resource type="GDScript" id="GDScript_3wmv5"]
+script/source = "extends Node2D
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	pass
+
+
+
+
+# card.gd (attached to Area2D)
+#extends Area2D
+#
+#func _ready():
+	#mouse_entered.connect(_on_mouse_entered)
+	#mouse_exited.connect(_on_mouse_exited)
+	#input_event.connect(_on_input_event)
+#
+#func _on_mouse_entered():
+	#create_tween().tween_property(self, \"scale\", Vector2(1.1, 1.1), 0.2)
+#
+#func _on_mouse_exited():
+	#create_tween().tween_property(self, \"scale\", Vector2(1, 1), 0.2)
+#
+#func _on_input_event(event):
+	#if event is InputEventMouseButton and event.pressed:
+		#print(\"Clicou na carta!\")
+"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_kkp5k"]
+size = Vector2(150, 200)
+
+[node name="Main" type="Node2D" unique_id=435446635]
+script = SubResource("GDScript_3wmv5")
+
+[node name="CardManager" type="Node2D" parent="." unique_id=1688622068]
+script = ExtResource("2_3wmv5")
+
+[node name="CardSlot" parent="." unique_id=371871446 instance=ExtResource("5_42vr3")]
+position = Vector2(957, 357)
+
+[node name="PlayerHand" type="Node2D" parent="." unique_id=761351319]
+script = ExtResource("5_kdtpo")
+
+[node name="Deck" type="Node2D" parent="." unique_id=223496872]
+position = Vector2(150, 890)
+script = ExtResource("4_qnx4h")
+
+[node name="Sprite2D" type="Sprite2D" parent="Deck" unique_id=1057648162]
+texture = ExtResource("4_kkp5k")
+
+[node name="Area2D" type="Area2D" parent="Deck" unique_id=1309199309]
+collision_layer = 4
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Deck/Area2D" unique_id=1550711039]
+shape = SubResource("RectangleShape2D_kkp5k")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Deck" unique_id=825749417]
+modulate = Color(0, 0, 0, 1)
+offset_left = -40.0
+offset_top = -40.0
+scale = Vector2(2, 2)
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="InputManager" type="Node2D" parent="." unique_id=642366794]
+position = Vector2(150, 890)
+script = ExtResource("6_kiwwe")
