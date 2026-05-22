@@ -14,10 +14,10 @@ var card_database_reference
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	card_database_reference = preload("res://Scripts/card_db.gd") 
 	for i in range (PLAYER_HAND_SIZE):
 		draw_card()
 	$RichTextLabel.text = str(player_deck.size())
-	card_database_reference = preload("res://Scripts/card_db.gd")
 
 func draw_card():
 	
@@ -31,6 +31,7 @@ func draw_card():
 		new_card.name = "Card"
 		new_card.setup(card_drawn)
 		$"../PlayerHand".add_card_to_hand(new_card, CARD_DRAW_SPEED)
+		new_card.get_node("AnimationPlayer").play("card_flip")
 	
 	#caso o jogador pegue a ultima carta
 	#MUDAR ISSO PARA REINICIAR DECK
