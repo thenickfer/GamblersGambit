@@ -4,7 +4,10 @@ const CARD_SCENE_PATH = "res://Scenes/Card.tscn"
 const CARD_DRAW_SPEED = 0.2
 const PLAYER_HAND_SIZE = 5
 
-var player_deck = ["Exemplo0", "Exemplo1", "Exemplo2", "Exemplo3", "Exemplo4", "Exemplo5", "Exemplo6"]
+var player_deck = [
+	"Espada", "Espada", "Escudo", "Escudo", "Poção", "Fúria", "Veneno",
+	"Bola de Fogo", "Muralha", "Bênção", "Adrenalina", "Maldição",
+]
 var card_database_reference
 
 #collision layer do deck = 4
@@ -21,13 +24,12 @@ func draw_card():
 	if ($"../PlayerHand".player_hand.size()<5):
 		var card_drawn_index = randi_range(0, player_deck.size()-1)
 		var card_drawn = player_deck[card_drawn_index]
-		print(card_drawn) # REMOVER
-		player_deck.erase(card_drawn)
+		player_deck.remove_at(card_drawn_index)
 		var card_scene = preload(CARD_SCENE_PATH)
 		var new_card = card_scene.instantiate()
-		#new_card.get_node
 		$"../CardManager".add_child(new_card)
 		new_card.name = "Card"
+		new_card.setup(card_drawn)
 		$"../PlayerHand".add_card_to_hand(new_card, CARD_DRAW_SPEED)
 	
 	#caso o jogador pegue a ultima carta

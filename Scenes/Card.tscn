@@ -18,21 +18,47 @@ texture = ExtResource("1_dd2wi")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=1213194820]
 shape = SubResource("RectangleShape2D_hael8")
 
-[node name="Value" type="RichTextLabel" parent="." unique_id=1449511136]
-modulate = Color(0, 0, 0, 1)
-offset_left = 43.0
-offset_top = -93.0
-offset_right = 83.0
-offset_bottom = -53.0
-text = "0"
+[node name="Nome" type="Label" parent="." unique_id=105035912]
+offset_left = -67.0
+offset_top = -59.0
+offset_right = 69.0
+offset_bottom = -37.0
+theme_override_colors/font_color = Color(0.16, 0.1, 0.06, 1)
+theme_override_font_sizes/font_size = 15
+text = "NOME"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="Action" type="RichTextLabel" parent="." unique_id=2107465559]
-modulate = Color(0, 0, 0, 1)
-offset_left = -62.0
-offset_top = 59.0
-offset_right = 56.0
-offset_bottom = 99.0
-text = "Ataque"
+[node name="Valor" type="Label" parent="." unique_id=1959246517]
+offset_left = -61.0
+offset_top = 16.0
+offset_right = 65.0
+offset_bottom = 36.0
+theme_override_colors/font_color = Color(0.16, 0.1, 0.06, 1)
+theme_override_font_sizes/font_size = 14
+text = "VALOR: X"
+vertical_alignment = 1
+
+[node name="Turnos" type="Label" parent="." unique_id=2138472287]
+offset_left = -61.0
+offset_top = 36.0
+offset_right = 65.0
+offset_bottom = 56.0
+theme_override_colors/font_color = Color(0.16, 0.1, 0.06, 1)
+theme_override_font_sizes/font_size = 14
+text = "TURNOS: X"
+vertical_alignment = 1
+
+[node name="Tipo" type="Label" parent="." unique_id=130153369]
+offset_left = -68.0
+offset_top = 69.0
+offset_right = 68.0
+offset_bottom = 91.0
+theme_override_colors/font_color = Color(0.16, 0.1, 0.06, 1)
+theme_override_font_sizes/font_size = 15
+text = "TIPO"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [connection signal="mouse_entered" from="Area2D" to="." method="_on_area_2d_mouse_entered"]
 [connection signal="mouse_exited" from="Area2D" to="." method="_on_area_2d_mouse_exited"]
