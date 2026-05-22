@@ -6,54 +6,66 @@
 [ext_resource type="PackedScene" uid="uid://chrbko46y0tm" path="res://Scenes/CardSlot.tscn" id="5_42vr3"]
 [ext_resource type="Script" uid="uid://5gkydk20d3wg" path="res://Scripts/player_hand.gd" id="5_kdtpo"]
 [ext_resource type="Script" uid="uid://6f1h2c834lxb" path="res://Scripts/input_manager.gd" id="6_kiwwe"]
-
-[sub_resource type="GDScript" id="GDScript_3wmv5"]
-script/source = "extends Node2D
-
-
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	pass # Replace with function body.
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
-
-
-
-
-# card.gd (attached to Area2D)
-#extends Area2D
-#
-#func _ready():
-	#mouse_entered.connect(_on_mouse_entered)
-	#mouse_exited.connect(_on_mouse_exited)
-	#input_event.connect(_on_input_event)
-#
-#func _on_mouse_entered():
-	#create_tween().tween_property(self, \"scale\", Vector2(1.1, 1.1), 0.2)
-#
-#func _on_mouse_exited():
-	#create_tween().tween_property(self, \"scale\", Vector2(1, 1), 0.2)
-#
-#func _on_input_event(event):
-	#if event is InputEventMouseButton and event.pressed:
-		#print(\"Clicou na carta!\")
-"
+[ext_resource type="Texture2D" uid="uid://c8qjav1rnwrhr" path="res://Assets/card_slot_placeholder.png" id="7_slotbg"]
+[ext_resource type="Script" uid="uid://cvi4ygvi80o8" path="res://Scripts/combatant.gd" id="8_cmbt"]
+[ext_resource type="Script" uid="uid://c5xybp6y6cf3q" path="res://Scripts/game_manager.gd" id="9_gm"]
+[ext_resource type="Texture2D" uid="uid://bx5pyf0idasgg" path="res://Assets/CartasTemporarias_Placeholder.png" id="10_temp"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kkp5k"]
 size = Vector2(150, 200)
 
 [node name="Main" type="Node2D" unique_id=435446635]
-script = SubResource("GDScript_3wmv5")
+script = ExtResource("9_gm")
 metadata/_edit_horizontal_guides_ = [268.0, 752.0]
 
 [node name="CardManager" type="Node2D" parent="." unique_id=1688622068]
 script = ExtResource("2_3wmv5")
 
-[node name="CardSlot" parent="." unique_id=371871446 instance=ExtResource("5_42vr3")]
+[node name="SlotBackground" type="Sprite2D" parent="." unique_id=900100200]
+z_index = -1
 position = Vector2(960, 510)
+texture = ExtResource("7_slotbg")
+
+[node name="TempCardsBoard" type="Sprite2D" parent="." unique_id=900100201]
+z_index = -1
+position = Vector2(187, 509)
+rotation = -1.5707964
+texture = ExtResource("10_temp")
+
+[node name="PlayerTempSlots" type="Node2D" parent="." unique_id=1356773653]
+position = Vector2(199, 727)
+rotation = -1.5707964
+
+[node name="Slot0" type="Marker2D" parent="PlayerTempSlots" unique_id=1229247587]
+position = Vector2(39.999996, 52)
+scale = Vector2(0.54, 0.54)
+
+[node name="Slot1" type="Marker2D" parent="PlayerTempSlots" unique_id=1025381305]
+position = Vector2(129, 52)
+scale = Vector2(0.54, 0.54)
+
+[node name="Slot2" type="Marker2D" parent="PlayerTempSlots" unique_id=2060807567]
+position = Vector2(218, 52)
+scale = Vector2(0.54, 0.54)
+
+[node name="Slot3" type="Marker2D" parent="PlayerTempSlots" unique_id=2074534713]
+position = Vector2(307, 52)
+scale = Vector2(0.54, 0.54)
+
+[node name="Slot4" type="Marker2D" parent="PlayerTempSlots" unique_id=1832817253]
+position = Vector2(396, 52)
+scale = Vector2(0.54, 0.54)
+
+[node name="PlayerSlot" parent="." unique_id=1365476113 instance=ExtResource("5_42vr3")]
+visible = false
+position = Vector2(695, 505)
+drop_area_size = Vector2(1227, 480)
+drop_area_offset = Vector2(265, 5)
+
+[node name="OpponentSlot" parent="." unique_id=760690296 instance=ExtResource("5_42vr3")]
+visible = false
+position = Vector2(1196, 503)
+is_player_slot = false
 
 [node name="PlayerHand" type="Node2D" parent="." unique_id=761351319]
 script = ExtResource("5_kdtpo")
@@ -87,7 +99,7 @@ vertical_alignment = 1
 position = Vector2(150, 890)
 script = ExtResource("6_kiwwe")
 
-[node name="ExemploPlayer" type="Label" parent="." unique_id=2086271339]
+[node name="PlayerStats" type="Label" parent="." unique_id=2086271339]
 offset_left = 41.0
 offset_top = 31.0
 offset_right = 165.0
@@ -97,9 +109,11 @@ text = "Player
 
 Vida:
 Energia:"
+script = ExtResource("8_cmbt")
+start_health = 10
 
-[node name="ExemploOponente" type="Label" parent="." unique_id=437947903]
-offset_left = 1757.0
+[node name="OpponentStats" type="Label" parent="." unique_id=437947903]
+offset_left = 1657.0
 offset_top = 31.0
 offset_right = 1881.0
 offset_bottom = 220.0
@@ -109,3 +123,14 @@ text = "Inimigo
 :Vida
 :Energia"
 horizontal_alignment = 2
+script = ExtResource("8_cmbt")
+combatant_name = "Inimigo"
+
+[node name="TurnLabel" type="Label" parent="." unique_id=512094871]
+offset_left = 760.0
+offset_top = 20.0
+offset_right = 1160.0
+offset_bottom = 200.0
+theme_override_font_sizes/font_size = 34
+text = "Turno: 1"
+horizontal_alignment = 1
