@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://c8qjav1rnwrhr" path="res://Assets/card_slot_placeholder.png" id="2_mt86f"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kdtpo"]
-size = Vector2(818, 254)
+size = Vector2(1228, 480)
 
 [node name="CardSlot" type="Node2D" unique_id=371871446]
 script = ExtResource("1_mt86f")
