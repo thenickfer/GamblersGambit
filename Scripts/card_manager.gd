@@ -8,11 +8,13 @@ var card_being_dragged
 var screen_size
 var is_hovering_on_card
 var player_hand_reference
+var game_manager_reference
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	screen_size = get_viewport_rect().size
 	player_hand_reference = $"../PlayerHand"
+	game_manager_reference = get_parent()
 	$"../InputManager".connect("left_mouse_button_released", on_left_click_released)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -30,14 +32,19 @@ func start_drag(card):
 func finish_drag():
 	card_being_dragged.scale = Vector2(1.05, 1.05) 
 	var card_slot_found = raycast_check_for_card_slot()
-	if card_slot_found and not card_slot_found.card_in_slot :
+	if card_slot_found and card_slot_found.is_player_slot:
 		player_hand_reference.remove_card_from_hand(card_being_dragged)
-		card_being_dragged.position = card_slot_found.position
-		#card_being_dragged.apply_scale(Vector2(1.5, 1.5)) arrumar depois
 		card_being_dragged.get_node("Area2D/CollisionShape2D").disabled = true
-		card_slot_found.card_in_slot = true
-		
-		# MUDAR ESSA PORRA
+
+		# aplica efeito + acaba turno; retorna true se a carta foi pro board temporario
+		var went_to_board = game_manager_reference.play_card(card_being_dragged)
+		if not went_to_board:
+			# carta instantanea: ocupa o slot central (descarta a anterior)
+			if card_slot_found.card_in_slot and is_instance_valid(card_slot_found.card_node):
+				card_slot_found.card_node.queue_free()
+			card_being_dragged.global_position = card_slot_found.get_card_snap_position()
+			card_slot_found.card_in_slot = true
+			card_slot_found.card_node = card_being_dragged
 		$"../Deck".draw_card()
 	else:
 		player_hand_reference.add_card_to_hand(card_being_dragged, DEFAULT_CARD_MOVE_SPEED)
@@ -64,6 +71,8 @@ func on_hovered_off_card(card):
 		is_hovering_on_card = false
 	
 func highlight_card(card, hovered):
+	if card.get_meta("on_temp_board", false):
+		return
 	if hovered:
 		card.scale = Vector2(1.05, 1.05)
 		card.z_index = 2
@@ -94,6 +103,10 @@ func raycast_check_for_card_slot():
 	parameters.collision_mask = COLLISION_MASK_CARD_SLOT
 	var result = space_state.intersect_point(parameters)
 	if result.size()>0:
+		for hit in result:
+			var slot = hit.collider.get_parent()
+			if slot.is_player_slot:
+				return slot
 		return result[0].collider.get_parent()
 	return null
 	

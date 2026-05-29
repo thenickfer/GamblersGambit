@@ -4,7 +4,10 @@ const CARD_SCENE_PATH = "res://Scenes/Card.tscn"
 const CARD_DRAW_SPEED = 0.2
 const PLAYER_HAND_SIZE = 5
 
-var player_deck = ["Attack1", "Defence1", "Cure1", "Buff1", "Debuff1", "Energy1"] 
+var player_deck = [
+	"Espada", "Espada", "Escudo", "Escudo", "Poção", "Fúria", "Veneno",
+	"Bola de Fogo", "Muralha", "Bênção", "Adrenalina", "Maldição",
+]
 var card_database_reference
 
 #collision layer do deck = 4
@@ -20,17 +23,13 @@ func draw_card():
 	
 	if ($"../PlayerHand".player_hand.size()<5):
 		var card_drawn_index = randi_range(0, player_deck.size()-1)
-		var card_drawn_name = player_deck[card_drawn_index]
-		#print(card_drawn_name) # REMOVER
-		player_deck.erase(card_drawn_name)
+		var card_drawn = player_deck[card_drawn_index]
+		player_deck.remove_at(card_drawn_index)
 		var card_scene = preload(CARD_SCENE_PATH)
 		var new_card = card_scene.instantiate()
-		var card_image_path = str("res://Assets/Cards/" + card_drawn_name + ".png")
-		new_card.get_node("CardImage").texture = load(card_image_path)
-		new_card.get_node("Action").text = str(displayAction(card_database_reference.CARDS[card_drawn_name][0]))  # Talvez mudar isso no futuro
-		new_card.get_node("Value").text = str(card_database_reference.CARDS[card_drawn_name][1])
 		$"../CardManager".add_child(new_card)
 		new_card.name = "Card"
+		new_card.setup(card_drawn)
 		$"../PlayerHand".add_card_to_hand(new_card, CARD_DRAW_SPEED)
 		new_card.get_node("AnimationPlayer").play("card_flip")
 	
@@ -43,18 +42,3 @@ func draw_card():
 		
 	$RichTextLabel.text = str(player_deck.size())
 	
-# Funcao usada para teste para mostrar a acao da carta em cima da carta
-func displayAction(actionValue):
-	match actionValue:
-		card_database_reference.CardType.ATTACK:
-			return "Attack"
-		card_database_reference.CardType.DEFENCE:
-			return "Defence"
-		card_database_reference.CardType.CURE:
-			return "Cure"
-		card_database_reference.CardType.BUFF:
-			return "Buff"
-		card_database_reference.CardType.DEBUFF:
-			return "Debuff"
-		card_database_reference.CardType.ENERGY:
-			return "Energy"
