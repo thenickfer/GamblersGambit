@@ -135,23 +135,15 @@ theme_override_font_sizes/font_size = 34
 text = "Turno: 1"
 horizontal_alignment = 1
 
-[node name="OpponentDeck" type="Node2D" parent="." unique_id=225496872]
-position = Vector2(1770, 125)
-
-[node name="Sprite2D" type="Sprite2D" parent="OpponentDeck" unique_id=1157648162]
-scale = Vector2(0.7, 0.7)
-texture = ExtResource("4_kkp5k")
-
-[node name="RichTextLabel" type="RichTextLabel" parent="OpponentDeck" unique_id=925749417]
-modulate = Color(0, 0, 0, 1)
-offset_left = -17.0
-offset_top = -26.0
-offset_right = 18.0
-offset_bottom = 24.0
-theme_override_font_sizes/normal_font_size = 32
-text = "0"
-horizontal_alignment = 1
-vertical_alignment = 1
+[node name="OpponentHandLabel" type="Label" parent="." unique_id=925749417]
+offset_left = 1220.0
+offset_top = 300.0
+offset_right = 1880.0
+offset_bottom = 760.0
+theme_override_font_sizes/font_size = 20
+horizontal_alignment = 2
+vertical_alignment = 0
+text = "Mao CPU:"
 
 [node name="PlayerFxLabel" type="Label" parent="." unique_id=777001]
 visible = false

@@ -34,7 +34,7 @@ var status_by_combatant := {}
 @onready var player_hand = $PlayerHand
 @onready var deck_node = $Deck
 @onready var opponent_slot = $OpponentSlot
-@onready var opponent_deck_count = $OpponentDeck/RichTextLabel
+@onready var opponent_hand_label = $OpponentHandLabel
 @onready var player_fx_label = $PlayerFxLabel
 @onready var opponent_fx_label = $OpponentFxLabel
 @onready var player_status_label = $PlayerStatusLabel
@@ -51,7 +51,7 @@ func _ready() -> void:
 	_setup_combatants()
 	battle_state = BattleState.PLAYER_TURN
 	_refresh_turn_label()
-	_refresh_opponent_deck_label()
+	_refresh_opponent_hand_label()
 	_refresh_status_labels()
 
 func _setup_combatants() -> void:
@@ -118,6 +118,7 @@ func _cpu_take_turn() -> void:
 	var idx = randi_range(0, cpu_combatant.hand.size() - 1)
 	var card_name: String = cpu_combatant.hand[idx]
 	cpu_combatant.hand.remove_at(idx)
+	_refresh_opponent_hand_label()
 	_show_cpu_card_preview(card_name)
 
 	var card_node = _build_virtual_card(card_name)
@@ -157,10 +158,13 @@ func draw_cpu_card() -> void:
 	if cpu_combatant.hand.size() >= MAX_HAND_SIZE:
 		return
 	cpu_combatant.draw_random_card()
-	_refresh_opponent_deck_label()
+	_refresh_opponent_hand_label()
 
-func _refresh_opponent_deck_label() -> void:
-	opponent_deck_count.text = str(cpu_combatant.deck.size())
+func _refresh_opponent_hand_label() -> void:
+	var lines: Array[String] = ["Mao CPU:"]
+	for i in range(cpu_combatant.hand.size()):
+		lines.append("%d. %s" % [i + 1, cpu_combatant.hand[i]])
+	opponent_hand_label.text = "\n".join(lines)
 
 func _show_cpu_card_preview(card_name: String) -> void:
 	if opponent_slot.card_in_slot and is_instance_valid(opponent_slot.card_node):
