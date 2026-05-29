@@ -24,6 +24,7 @@ var cpu_attack_penalty: int = 0
 var temp_cards: Array = []
 var player_temp_slots: Array = []
 var occupied: Array[bool] = []
+var action_log: Array[String] = []
 
 @onready var player_combatant = $PlayerStats
 @onready var cpu_combatant = $OpponentStats
@@ -71,6 +72,7 @@ func try_play_player_card(card_node) -> Dictionary:
 		return {"accepted": false, "went_to_board": false}
 
 	var went_to_board = _process_card_play(player_combatant, cpu_combatant, card_node)
+	_log_action("%s jogou %s." % [player_combatant.combatant_name, card_node.card_name])
 	if not went_to_board:
 		player_combatant.add_to_discard(card_node.card_name)
 
@@ -90,6 +92,7 @@ func _process_card_play(source, target, card_node) -> bool:
 	})
 	if card_node.card_turns > 0:
 		_place_temp_card(card_node, source)
+		_log_action("Efeito temporario ativo por %d turnos." % card_node.card_turns)
 		return true
 	return false
 
@@ -102,28 +105,15 @@ func _end_player_turn() -> void:
 func _cpu_take_turn() -> void:
 	if battle_state == BattleState.ENDED:
 		return
-	if cpu_combatant.hand.is_empty():
-		draw_cpu_card()
-	if cpu_combatant.hand.is_empty():
-		_end_cpu_turn()
-		return
-
-	var idx = randi_range(0, cpu_combatant.hand.size() - 1)
-	var card_name = cpu_combatant.hand[idx]
-	cpu_combatant.hand.remove_at(idx)
-	var card_node = _build_virtual_card(card_name)
-	var went_to_board = _process_card_play(cpu_combatant, player_combatant, card_node)
-	if not went_to_board:
-		cpu_combatant.add_to_discard(card_name)
-
-	if _check_battle_end():
-		return
+	# Placeholder: CPU nao toma decisoes nem aplica efeitos nesta entrega.
+	_log_action("%s (placeholder) passou o turno." % cpu_combatant.combatant_name)
 	_end_cpu_turn()
 
 func _end_cpu_turn() -> void:
 	turn_number += 1
 	draw_cpu_card()
 	battle_state = BattleState.PLAYER_TURN
+	_log_action("Novo turno do jogador.")
 	_refresh_turn_label()
 
 func _build_virtual_card(card_name: String) -> Dictionary:
@@ -231,7 +221,8 @@ func _check_battle_end() -> bool:
 
 func _end_battle(winner, loser) -> void:
 	battle_state = BattleState.ENDED
-	turn_label.text = "Batalha Encerrada\nVencedor: %s" % winner.combatant_name
+	_log_action("Batalha encerrada. Vencedor: %s." % winner.combatant_name)
+	turn_label.text = "Batalha Encerrada\nVencedor: %s\n\n%s" % [winner.combatant_name, "\n".join(action_log)]
 	emit_signal("battle_ended", winner, loser)
 
 func _refresh_turn_label() -> void:
@@ -240,4 +231,12 @@ func _refresh_turn_label() -> void:
 		txt += "\nMeu ataque: +%d" % player_attack_bonus
 	if cpu_attack_penalty > 0:
 		txt += "\nAtaque inimigo: -%d" % cpu_attack_penalty
+	if not action_log.is_empty():
+		txt += "\n\nAcoes:\n" + "\n".join(action_log)
 	turn_label.text = txt
+
+func _log_action(message: String) -> void:
+	action_log.append(message)
+	if action_log.size() > 6:
+		action_log.pop_front()
+	_refresh_turn_label()
