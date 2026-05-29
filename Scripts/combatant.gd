@@ -21,8 +21,10 @@ func _ready() -> void:
 	is_alive = current_health > 0
 	_refresh()
 
-func setup_deck(cards: Array[String]) -> void:
-	deck = cards.duplicate()
+func setup_deck(cards: Array) -> void:
+	deck.clear()
+	for card_name in cards:
+		deck.append(String(card_name))
 	hand.clear()
 	discard.clear()
 

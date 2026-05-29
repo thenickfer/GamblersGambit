@@ -46,16 +46,18 @@ func _ready() -> void:
 	_refresh_turn_label()
 
 func _setup_combatants() -> void:
-	player_combatant.setup_deck([
+	var player_cards: Array[String] = [
 		"Espada", "Espada", "Escudo", "Escudo", "Poção", "Fúria", "Veneno",
 		"Bola de Fogo", "Muralha", "Bênção", "Adrenalina", "Maldição",
-	])
-	cpu_combatant.setup_deck([
+	]
+	var cpu_cards: Array[String] = [
 		"Espada", "Escudo", "Poção", "Fúria", "Veneno", "Bola de Fogo", "Muralha",
 		"Bênção", "Adrenalina", "Maldição",
-	])
+	]
+	player_combatant.setup_deck(player_cards)
+	cpu_combatant.setup_deck(cpu_cards)
 	for _i in range(MAX_HAND_SIZE):
-		draw_player_card()
+		deck_node.draw_card()
 		draw_cpu_card()
 
 func try_play_player_card(card_node) -> Dictionary:
@@ -94,7 +96,6 @@ func _process_card_play(source, target, card_node) -> bool:
 func _end_player_turn() -> void:
 	battle_state = BattleState.CPU_TURN
 	_tick_temp_cards()
-	draw_player_card()
 	if not _check_battle_end():
 		_cpu_take_turn()
 

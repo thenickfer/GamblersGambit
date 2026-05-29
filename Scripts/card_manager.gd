@@ -9,11 +9,13 @@ var screen_size
 var is_hovering_on_card
 var player_hand_reference
 var game_manager_reference
+var deck_reference
 
 func _ready() -> void:
 	screen_size = get_viewport_rect().size
 	player_hand_reference = $"../PlayerHand"
 	game_manager_reference = get_parent()
+	deck_reference = $"../Deck"
 	$"../InputManager".connect("left_mouse_button_released", on_left_click_released)
 
 func _process(delta: float) -> void:
@@ -40,6 +42,7 @@ func finish_drag():
 				card_being_dragged.global_position = card_slot_found.get_card_snap_position()
 				card_slot_found.card_in_slot = true
 				card_slot_found.card_node = card_being_dragged
+			deck_reference.draw_card()
 		else:
 			player_hand_reference.add_card_to_hand(card_being_dragged, DEFAULT_CARD_MOVE_SPEED)
 	else:
