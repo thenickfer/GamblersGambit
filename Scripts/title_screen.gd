@@ -2,7 +2,7 @@ extends Control
 
 @export var fade_duration: float = 1.5
 @export var transition_duration: float = 0.6
-@export_file("*.tscn") var next_scene: String = "res://src/scenes/main_menu/main_menu.tscn"
+@export_file("*.tscn") var next_scene: String = "res://Scenes/main_menu.tscn"
 
 @onready var fade_overlay: ColorRect = $FadeOverlay
 @onready var prompt: Label = $Prompt

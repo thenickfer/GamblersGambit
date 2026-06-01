@@ -6,8 +6,8 @@ const CardDB = preload("res://Scripts/card_db.gd")
 const CARD_SCENE_PATH = "res://Scenes/Card.tscn"
 const MAX_HAND_SIZE = 5
 
-const MENU_FONT = preload("res://src/global_assets/fonts/SuperPixel-m2L8j.ttf")
-const MAIN_MENU_SCENE = "res://src/scenes/main_menu/main_menu.tscn"
+const MENU_FONT = preload("res://Assets/fonts/SuperPixel-m2L8j.ttf")
+const MAIN_MENU_SCENE = "res://Scenes/main_menu.tscn"
 const TEXT_COLOR = Color(1, 0.95, 0.82, 1)
 const TEXT_HIGHLIGHT = Color(1, 0.78, 0.36, 1)
 
@@ -248,6 +248,8 @@ func _show_health_delta(combatant, delta: int) -> void:
 	tween.tween_property(label, "position", start_pos + Vector2(0, -20), 0.4)
 	tween.parallel().tween_property(label, "modulate:a", 0.0, 0.4)
 	tween.finished.connect(func():
+		if not is_instance_valid(label):
+			return
 		label.visible = false
 		label.modulate.a = 1.0
 		label.position = start_pos

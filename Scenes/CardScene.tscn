@@ -82,7 +82,6 @@ text = "Player
 Vida:
 Energia:"
 script = ExtResource("8_cmbt")
-start_health = 10
 
 [node name="OpponentStats" type="Label" parent="." unique_id=437947903]
 offset_left = 1657.0

@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bw8mqybyf4657"
-path="res://.godot/imported/GAMBIT'S GAMBLER (1).png-301f81c3f7d6b1714cfa2dfde880cc0f.ctex"
+path="res://.godot/imported/GAMBIT'S GAMBLER (1).png-f2293e226c64564e150b1dab6a817bfa.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://src/global_assets/GAMBIT'S GAMBLER (1).png"
-dest_files=["res://.godot/imported/GAMBIT'S GAMBLER (1).png-301f81c3f7d6b1714cfa2dfde880cc0f.ctex"]
+source_file="res://Assets/GAMBIT'S GAMBLER (1).png"
+dest_files=["res://.godot/imported/GAMBIT'S GAMBLER (1).png-f2293e226c64564e150b1dab6a817bfa.ctex"]
 
 [params]
 

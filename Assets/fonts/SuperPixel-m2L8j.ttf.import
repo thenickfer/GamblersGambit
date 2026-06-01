@@ -3,12 +3,12 @@
 importer="font_data_dynamic"
 type="FontFile"
 uid="uid://cjf0rg7ma2ynq"
-path="res://.godot/imported/SuperPixel-m2L8j.ttf-057c92d95887f6d169867ed05428b1ce.fontdata"
+path="res://.godot/imported/SuperPixel-m2L8j.ttf-8901fb06f785374a618543f2e922de2f.fontdata"
 
 [deps]
 
-source_file="res://src/global_assets/fonts/SuperPixel-m2L8j.ttf"
-dest_files=["res://.godot/imported/SuperPixel-m2L8j.ttf-057c92d95887f6d169867ed05428b1ce.fontdata"]
+source_file="res://Assets/fonts/SuperPixel-m2L8j.ttf"
+dest_files=["res://.godot/imported/SuperPixel-m2L8j.ttf-8901fb06f785374a618543f2e922de2f.fontdata"]
 
 [params]
 
