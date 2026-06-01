@@ -18,7 +18,7 @@ func _ready() -> void:
 # Configura a carta a partir de uma entrada do card_db.gd.
 func setup(name: String) -> void:
 	card_name = name
-	var data = CardDB.CARDS[name]
+	var data: Array = CardDB.CARDS[name]
 	card_action = data[0]
 	card_value = data[1]
 	card_turns = data[2]
@@ -26,6 +26,8 @@ func setup(name: String) -> void:
 	$Valor.text = "VALOR: " + str(card_value)
 	$Turnos.text = "TURNOS: " + str(card_turns)
 	$Tipo.text = CardDB.ACTION_NAMES[card_action]
+	var art_path: String = data[3] if data.size() > 3 else CardDB.ACTION_ARTS[card_action]
+	$CardImage.set_art_from_path(art_path)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

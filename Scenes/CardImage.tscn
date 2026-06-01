@@ -1,0 +1,29 @@
+[gd_scene format=3 uid="uid://c42ugbp5qag2k"]
+
+[ext_resource type="Script" uid="uid://dtipw02tqjb77" path="res://Scripts/card_image.gd" id="1_cardimage"]
+[ext_resource type="Texture2D" uid="uid://blae6trogj0g0" path="res://Assets/Cards/Bases/sem borda.png" id="4_7fk7u"]
+[ext_resource type="Texture2D" uid="uid://51sou8fo531p" path="res://Assets/Cards/Bases/borda.png" id="5_wh71p"]
+
+[node name="CardImage" type="Node2D" unique_id=609141695]
+script = ExtResource("1_cardimage")
+base_texture = ExtResource("4_7fk7u")
+frame_texture = ExtResource("5_wh71p")
+
+[node name="BaseImage" type="Sprite2D" parent="." unique_id=160312341]
+position = Vector2(-1.4901161e-08, -2.9802322e-08)
+scale = Vector2(0.6674107, 0.66741073)
+texture = ExtResource("4_7fk7u")
+
+[node name="ArtImage" type="Sprite2D" parent="." unique_id=1162617460]
+z_index = 1
+position = Vector2(-0.25, -33.5)
+scale = Vector2(1.0514019, 1.046875)
+region_enabled = true
+region_rect = Rect2(0, 0, 107, 64)
+region_filter_clip_enabled = true
+
+[node name="FrameImage" type="Sprite2D" parent="." unique_id=256789004]
+z_index = 2
+position = Vector2(-0.49999702, 0.9999877)
+scale = Vector2(1.0066668, 1.01)
+texture = ExtResource("5_wh71p")
