@@ -1,0 +1,6 @@
+extends "res://Scripts/card_effects/effect_base.gd"
+
+func execute(context: Dictionary) -> void:
+	var source = context.source
+	var card = context.card
+	source.gain_energy(card.card_value)
