@@ -22,10 +22,10 @@ func setup(name: String) -> void:
 	card_action = data[0]
 	card_value = data[1]
 	card_turns = data[2]
-	$Nome.text = name
-	$Valor.text = "VALOR: " + str(card_value)
-	$Turnos.text = "TURNOS: " + str(card_turns)
-	$Tipo.text = CardDB.ACTION_NAMES[card_action]
+	$CardImage.set_nome(card_name)
+	$CardImage.set_value(card_value)
+	$CardImage.set_type(CardDB.ACTION_NAMES[card_action])
+	$CardImage.set_turns(card_turns)
 	var art_path: String = data[3] if data.size() > 3 else CardDB.ACTION_ARTS[card_action]
 	$CardImage.set_art_from_path(art_path)
 
