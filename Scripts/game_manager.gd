@@ -6,6 +6,11 @@ const CardDB = preload("res://Scripts/card_db.gd")
 const CARD_SCENE_PATH = "res://Scenes/Card.tscn"
 const MAX_HAND_SIZE = 5
 
+const MENU_FONT = preload("res://Assets/fonts/SuperPixel-m2L8j.ttf")
+const MAIN_MENU_SCENE = "res://Scenes/main_menu.tscn"
+const TEXT_COLOR = Color(1, 0.95, 0.82, 1)
+const TEXT_HIGHLIGHT = Color(1, 0.78, 0.36, 1)
+
 const EFFECTS = {
 	CardDB.Action.ATTACK: preload("res://Scripts/card_effects/effect_attack.gd"),
 	CardDB.Action.CURE: preload("res://Scripts/card_effects/effect_cure.gd"),
@@ -19,17 +24,12 @@ enum BattleState { SETUP, PLAYER_TURN, CPU_TURN, ENDED }
 
 var battle_state: int = BattleState.SETUP
 var turn_number: int = 1
-var player_attack_bonus: int = 0
-var cpu_attack_penalty: int = 0
-var temp_cards: Array = []
-var player_temp_slots: Array = []
-var occupied: Array[bool] = []
+var temp_cards: Array = []  # efeitos de varios turnos ativos (mostrados como texto nos StatusLabel)
 var status_by_combatant := {}
 
 @onready var player_combatant = $PlayerStats
 @onready var cpu_combatant = $OpponentStats
 @onready var turn_label = $TurnLabel
-@onready var temp_slots_root = $PlayerTempSlots
 @onready var card_manager = $CardManager
 @onready var player_hand = $PlayerHand
 @onready var deck_node = $Deck
@@ -41,12 +41,9 @@ var status_by_combatant := {}
 @onready var opponent_status_label = $OpponentStatusLabel
 
 func _ready() -> void:
-	for slot in temp_slots_root.get_children():
-		player_temp_slots.append(slot)
-		occupied.append(false)
-
 	player_combatant.died.connect(_on_combatant_died)
 	cpu_combatant.died.connect(_on_combatant_died)
+	battle_ended.connect(_on_battle_ended)
 
 	_setup_combatants()
 	battle_state = BattleState.PLAYER_TURN
@@ -98,7 +95,9 @@ func _process_card_play(source, target, card_node) -> bool:
 
 	if card_node.card_turns > 0:
 		_place_temp_card(card_node, source)
-	return false if card_node.card_turns == 0 else true
+	# a carta jogada sempre vai pro slot central/descarte; o efeito de varios
+	# turnos fica registrado e e mostrado como texto nos StatusLabel
+	return false
 
 func _end_player_turn() -> void:
 	battle_state = BattleState.CPU_TURN
@@ -180,30 +179,19 @@ func _show_cpu_card_preview(card_name: String) -> void:
 
 func _place_temp_card(card_node, source) -> void:
 	if card_node.card_action == CardDB.Action.BUFF:
-		_register_status(source, "Furia", card_node.card_turns)
-		if source == player_combatant:
-			player_attack_bonus += card_node.card_value
+		_register_status(source, card_node.card_name, card_node.card_turns, card_node.card_value, true)
 	if card_node.card_action == CardDB.Action.DEBUFF:
-		_register_status(_other_combatant(source), "Veneno", card_node.card_turns)
-		if source == player_combatant:
-			cpu_attack_penalty += card_node.card_value
+		_register_status(_other_combatant(source), card_node.card_name, card_node.card_turns, card_node.card_value, false)
 
-	var idx = _free_slot_index()
-	if idx != -1 and card_node is Node and source == player_combatant:
-		occupied[idx] = true
-		var slot = player_temp_slots[idx]
-		card_node.set_meta("on_temp_board", true)
-		_snap_temp_card_to_slot(card_node, slot)
-		call_deferred("_snap_temp_card_to_slot", card_node, slot)
-
-	temp_cards.append({"card": card_node, "slot": idx, "action": card_node.card_action, "value": card_node.card_value, "remaining": card_node.card_turns, "owner": source})
+	temp_cards.append({"action": card_node.card_action, "value": card_node.card_value, "remaining": card_node.card_turns, "owner": source})
 	_refresh_status_labels()
+	_refresh_turn_label()
 
-func _register_status(combatant, status_name: String, turns: int) -> void:
+func _register_status(combatant, status_name: String, turns: int, value: int, is_positive: bool) -> void:
 	var key = str(combatant.get_instance_id())
 	if not status_by_combatant.has(key):
 		status_by_combatant[key] = []
-	status_by_combatant[key].append({"name": status_name, "turns": turns})
+	status_by_combatant[key].append({"name": status_name, "turns": turns, "value": value, "is_positive": is_positive})
 
 func _tick_temp_cards() -> void:
 	var still_active = []
@@ -211,11 +199,10 @@ func _tick_temp_cards() -> void:
 		entry.remaining -= 1
 		if entry.remaining > 0:
 			still_active.append(entry)
-		else:
-			_expire_temp_card(entry)
 	temp_cards = still_active
 	_tick_statuses()
 	_refresh_status_labels()
+	_refresh_turn_label()
 
 func _tick_statuses() -> void:
 	for key in status_by_combatant.keys():
@@ -236,8 +223,10 @@ func _format_statuses_for(combatant) -> String:
 		return ""
 	var pieces: Array[String] = []
 	for status in status_by_combatant[key]:
-		pieces.append("[■] %s(%d)" % [status.name, status.turns])
-	return "  ".join(pieces)
+		var sign_txt = "+" if status.is_positive else "-"
+		var turno_txt = "turno" if status.turns == 1 else "turnos"
+		pieces.append("%s%d %s (%d %s)" % [sign_txt, status.value, status.name, status.turns, turno_txt])
+	return "\n".join(pieces)
 
 func _show_health_delta(combatant, delta: int) -> void:
 	if delta == 0:
@@ -255,28 +244,28 @@ func _show_health_delta(combatant, delta: int) -> void:
 	tween.tween_property(label, "position", start_pos + Vector2(0, -20), 0.4)
 	tween.parallel().tween_property(label, "modulate:a", 0.0, 0.4)
 	tween.finished.connect(func():
+		if not is_instance_valid(label):
+			return
 		label.visible = false
 		label.modulate.a = 1.0
 		label.position = start_pos
 	)
 
-func _expire_temp_card(entry) -> void:
-	if entry.owner == player_combatant and entry.action == CardDB.Action.BUFF:
-		player_attack_bonus -= entry.value
-	elif entry.owner == player_combatant and entry.action == CardDB.Action.DEBUFF:
-		cpu_attack_penalty -= entry.value
-	if entry.slot != -1:
-		occupied[entry.slot] = false
-	if entry.card is Node and is_instance_valid(entry.card):
-		entry.card.queue_free()
-
 func _other_combatant(combatant):
 	return cpu_combatant if combatant == player_combatant else player_combatant
 
+# Soma o valor de todas as cartas temporarias ativas de um dono e tipo de acao.
+func _sum_temp(owner, action) -> int:
+	var total = 0
+	for entry in temp_cards:
+		if entry.owner == owner and entry.action == action:
+			total += entry.value
+	return total
+
+# Modificador liquido de ataque de um combatente:
+# soma dos buffs nele MENOS soma dos debuffs aplicados nele (jogados pelo oponente).
 func get_attack_bonus(source) -> int:
-	if source == player_combatant:
-		return player_attack_bonus
-	return 0
+	return _sum_temp(source, CardDB.Action.BUFF) - _sum_temp(_other_combatant(source), CardDB.Action.DEBUFF)
 
 func _on_combatant_died(_combatant) -> void:
 	_check_battle_end()
@@ -297,23 +286,69 @@ func _end_battle(winner, loser) -> void:
 	turn_label.text = "Batalha Encerrada\nVencedor: %s" % winner.combatant_name
 	emit_signal("battle_ended", winner, loser)
 
+# Tela de fim de jogo: vitoria/derrota + botao de voltar ao menu (estilo dos menus).
+func _on_battle_ended(winner, _loser) -> void:
+	if winner == player_combatant:
+		_show_end_screen("VOCÊ VENCEU")
+	else:
+		_show_end_screen("FIM DE JOGO")
+
+func _show_end_screen(message: String) -> void:
+	var layer := CanvasLayer.new()
+	layer.layer = 100
+	layer.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(layer)
+
+	var backdrop := ColorRect.new()
+	backdrop.color = Color(0, 0, 0, 0.7)
+	backdrop.set_anchors_preset(Control.PRESET_FULL_RECT)
+	layer.add_child(backdrop)
+
+	var vbox := VBoxContainer.new()
+	vbox.set_anchors_preset(Control.PRESET_CENTER)
+	vbox.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	vbox.grow_vertical = Control.GROW_DIRECTION_BOTH
+	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	vbox.add_theme_constant_override("separation", 40)
+	layer.add_child(vbox)
+
+	var title := Label.new()
+	title.text = message
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_font_override("font", MENU_FONT)
+	title.add_theme_font_size_override("font_size", 90)
+	title.add_theme_color_override("font_color", TEXT_COLOR)
+	title.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
+	title.add_theme_constant_override("outline_size", 8)
+	vbox.add_child(title)
+
+	var button := Button.new()
+	button.text = "VOLTAR AO MENU"
+	button.flat = true
+	button.add_theme_font_override("font", MENU_FONT)
+	button.add_theme_font_size_override("font_size", 40)
+	button.add_theme_color_override("font_color", TEXT_COLOR)
+	button.add_theme_color_override("font_focus_color", TEXT_HIGHLIGHT)
+	button.add_theme_color_override("font_pressed_color", TEXT_HIGHLIGHT)
+	button.add_theme_color_override("font_hover_color", TEXT_HIGHLIGHT)
+	button.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
+	button.add_theme_constant_override("outline_size", 6)
+	button.pressed.connect(_on_back_to_menu_pressed)
+	vbox.add_child(button)
+	button.grab_focus()
+
+	get_tree().paused = true
+
+func _on_back_to_menu_pressed() -> void:
+	get_tree().paused = false
+	get_tree().change_scene_to_file(MAIN_MENU_SCENE)
+
 func _refresh_turn_label() -> void:
 	var txt = "Turno: %d" % turn_number
-	if player_attack_bonus > 0:
-		txt += "\nMeu ataque: +%d" % player_attack_bonus
-	if cpu_attack_penalty > 0:
-		txt += "\nAtaque inimigo: -%d" % cpu_attack_penalty
+	var my_attack = get_attack_bonus(player_combatant)
+	var enemy_attack = get_attack_bonus(cpu_combatant)
+	if my_attack != 0:
+		txt += "\nMeu ataque: %+d" % my_attack
+	if enemy_attack != 0:
+		txt += "\nAtaque inimigo: %+d" % enemy_attack
 	turn_label.text = txt
-
-func _snap_temp_card_to_slot(card, slot) -> void:
-	if not is_instance_valid(card) or not is_instance_valid(slot):
-		return
-	card.global_position = slot.global_position
-	card.global_rotation = slot.global_rotation
-	card.global_scale = slot.global_scale
-
-func _free_slot_index() -> int:
-	for i in range(player_temp_slots.size()):
-		if not occupied[i]:
-			return i
-	return -1

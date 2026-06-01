@@ -3,12 +3,12 @@
 importer="font_data_dynamic"
 type="FontFile"
 uid="uid://sn8e2l4o47iw"
-path="res://.godot/imported/Snowbell-Wp4g9.ttf-c0c8a7bdef70e8e90da4d0797795eda6.fontdata"
+path="res://.godot/imported/Snowbell-Wp4g9.ttf-0d4b777fab7582fc53714b78ed8d94f2.fontdata"
 
 [deps]
 
-source_file="res://src/global_assets/fonts/Snowbell-Wp4g9.ttf"
-dest_files=["res://.godot/imported/Snowbell-Wp4g9.ttf-c0c8a7bdef70e8e90da4d0797795eda6.fontdata"]
+source_file="res://Assets/fonts/Snowbell-Wp4g9.ttf"
+dest_files=["res://.godot/imported/Snowbell-Wp4g9.ttf-0d4b777fab7582fc53714b78ed8d94f2.fontdata"]
 
 [params]
 

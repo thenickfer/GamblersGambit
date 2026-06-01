@@ -12,6 +12,7 @@ var current_health: int
 var current_energy: int
 var hand: Array = []
 var deck: Array[String] = []
+var initial_deck: Array[String] = []  # copia das cartas iniciais para reiniciar o deck
 var discard: Array = []
 var is_alive: bool = true
 
@@ -23,8 +24,10 @@ func _ready() -> void:
 
 func setup_deck(cards: Array) -> void:
 	deck.clear()
+	initial_deck.clear()
 	for card_name in cards:
 		deck.append(String(card_name))
+		initial_deck.append(String(card_name))
 	hand.clear()
 	discard.clear()
 
@@ -46,6 +49,9 @@ func gain_energy(amount: int) -> void:
 	_refresh()
 
 func draw_random_card() -> String:
+	# quando o deck acaba, reinicia com as mesmas cartas iniciais
+	if deck.is_empty():
+		deck = initial_deck.duplicate()
 	if deck.is_empty():
 		return ""
 	var idx = randi_range(0, deck.size() - 1)

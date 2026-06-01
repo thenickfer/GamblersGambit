@@ -1,0 +1,80 @@
+[gd_scene format=3 uid="uid://2x54e04puxcm"]
+
+[ext_resource type="Texture2D" uid="uid://j26ljim52dto" path="res://Assets/background_menu.png" id="1_bg"]
+[ext_resource type="Script" uid="uid://e5yfpub68u2k" path="res://Scripts/main_menu.gd" id="2_script"]
+[ext_resource type="FontFile" uid="uid://cjf0rg7ma2ynq" path="res://Assets/fonts/SuperPixel-m2L8j.ttf" id="3_font"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_focus"]
+
+[node name="MainMenu" type="Control" unique_id=719566507]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_script")
+
+[node name="Background" type="TextureRect" parent="." unique_id=1820582368]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Buttons" type="VBoxContainer" parent="." unique_id=310054463]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -180.0
+offset_top = -130.0
+offset_right = 180.0
+offset_bottom = 130.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 18
+alignment = 1
+
+[node name="PlayButton" type="Button" parent="Buttons" unique_id=1522065080]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.95, 0.82, 1)
+theme_override_colors/font_focus_color = Color(1, 0.78, 0.36, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.78, 0.36, 1)
+theme_override_colors/font_hover_color = Color(1, 0.78, 0.36, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 40
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+text = "JOGAR"
+flat = true
+
+[node name="QuitButton" type="Button" parent="Buttons" unique_id=975738214]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.95, 0.82, 1)
+theme_override_colors/font_focus_color = Color(1, 0.78, 0.36, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.78, 0.36, 1)
+theme_override_colors/font_hover_color = Color(1, 0.78, 0.36, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 40
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+text = "SAIR"
+flat = true
+
+[node name="FadeOverlay" type="ColorRect" parent="." unique_id=704687274]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
