@@ -38,7 +38,12 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _on_play_pressed() -> void:
-	print("TODO: iniciar jogo")
+	play_button.disabled = true
+	var tween := create_tween()
+	tween.tween_property(fade_overlay, "color:a", 1.0, fade_duration)
+	tween.tween_callback(func() -> void:
+		get_tree().change_scene_to_file("res://Scenes/CardScene.tscn")
+	)
 
 
 func _on_settings_pressed() -> void:

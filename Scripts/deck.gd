@@ -4,10 +4,12 @@ const CARD_SCENE_PATH = "res://Scenes/Card.tscn"
 const CARD_DRAW_SPEED = 0.2
 const PLAYER_HAND_SIZE = 5
 
-var player_deck = [
+const INITIAL_DECK = [
 	"Espada", "Espada", "Escudo", "Escudo", "Poção", "Fúria", "Veneno",
 	"Bola de Fogo", "Muralha", "Bênção", "Adrenalina", "Maldição",
 ]
+
+var player_deck = INITIAL_DECK.duplicate()
 var card_database_reference
 
 #collision layer do deck = 4
@@ -33,12 +35,9 @@ func draw_card():
 		$"../PlayerHand".add_card_to_hand(new_card, CARD_DRAW_SPEED)
 		new_card.get_node("AnimationPlayer").play("card_flip")
 	
-	#caso o jogador pegue a ultima carta
-	#MUDAR ISSO PARA REINICIAR DECK
+	#caso o jogador pegue a ultima carta, reinicia o deck com as mesmas cartas
 	if player_deck.size() == 0:
-		$Area2D/CollisionShape2D.disabled = true
-		$Sprite2D.visible = false
-		$RichTextLabel.visible = false
-		
+		player_deck = INITIAL_DECK.duplicate()
+
 	$RichTextLabel.text = str(player_deck.size())
 	
