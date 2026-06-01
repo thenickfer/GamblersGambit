@@ -134,3 +134,48 @@ offset_bottom = 200.0
 theme_override_font_sizes/font_size = 34
 text = "Turno: 1"
 horizontal_alignment = 1
+
+[node name="OpponentHandLabel" type="Label" parent="." unique_id=925749417]
+offset_left = 1220.0
+offset_top = 300.0
+offset_right = 1880.0
+offset_bottom = 760.0
+theme_override_font_sizes/font_size = 20
+horizontal_alignment = 2
+vertical_alignment = 0
+text = "Mao CPU:"
+
+[node name="PlayerFxLabel" type="Label" parent="." unique_id=777001]
+visible = false
+offset_left = 240.0
+offset_top = 95.0
+offset_right = 340.0
+offset_bottom = 150.0
+theme_override_font_sizes/font_size = 40
+text = "-0"
+
+[node name="OpponentFxLabel" type="Label" parent="." unique_id=777002]
+visible = false
+offset_left = 1540.0
+offset_top = 95.0
+offset_right = 1640.0
+offset_bottom = 150.0
+theme_override_font_sizes/font_size = 40
+text = "-0"
+
+[node name="PlayerStatusLabel" type="Label" parent="." unique_id=777003]
+offset_left = 40.0
+offset_top = 230.0
+offset_right = 700.0
+offset_bottom = 270.0
+theme_override_font_sizes/font_size = 24
+text = ""
+
+[node name="OpponentStatusLabel" type="Label" parent="." unique_id=777004]
+offset_left = 1200.0
+offset_top = 230.0
+offset_right = 1880.0
+offset_bottom = 270.0
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 2
+text = ""
