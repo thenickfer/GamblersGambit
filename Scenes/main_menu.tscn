@@ -55,20 +55,6 @@ theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
 text = "JOGAR"
 flat = true
 
-[node name="SettingsButton" type="Button" parent="Buttons" unique_id=120327647]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.95, 0.82, 1)
-theme_override_colors/font_focus_color = Color(1, 0.78, 0.36, 1)
-theme_override_colors/font_pressed_color = Color(1, 0.78, 0.36, 1)
-theme_override_colors/font_hover_color = Color(1, 0.78, 0.36, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 6
-theme_override_fonts/font = ExtResource("3_font")
-theme_override_font_sizes/font_size = 40
-theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
-text = "CONFIGURAÇÕES"
-flat = true
-
 [node name="QuitButton" type="Button" parent="Buttons" unique_id=975738214]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.95, 0.82, 1)
@@ -81,115 +67,6 @@ theme_override_fonts/font = ExtResource("3_font")
 theme_override_font_sizes/font_size = 40
 theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
 text = "SAIR"
-flat = true
-
-[node name="SettingsPanel" type="Control" parent="." unique_id=1375730347]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Backdrop" type="ColorRect" parent="SettingsPanel" unique_id=582743525]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0, 0, 0, 0.7)
-
-[node name="Panel" type="PanelContainer" parent="SettingsPanel" unique_id=352272440]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -280.0
-offset_top = -180.0
-offset_right = 280.0
-offset_bottom = 180.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Margin" type="MarginContainer" parent="SettingsPanel/Panel" unique_id=1833083364]
-layout_mode = 2
-theme_override_constants/margin_left = 30
-theme_override_constants/margin_top = 30
-theme_override_constants/margin_right = 30
-theme_override_constants/margin_bottom = 30
-
-[node name="VBox" type="VBoxContainer" parent="SettingsPanel/Panel/Margin" unique_id=570446875]
-layout_mode = 2
-theme_override_constants/separation = 22
-
-[node name="Title" type="Label" parent="SettingsPanel/Panel/Margin/VBox" unique_id=2119897964]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.95, 0.82, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 5
-theme_override_fonts/font = ExtResource("3_font")
-theme_override_font_sizes/font_size = 36
-text = "CONFIGURAÇÕES"
-horizontal_alignment = 1
-
-[node name="VolumeRow" type="HBoxContainer" parent="SettingsPanel/Panel/Margin/VBox" unique_id=13983343]
-layout_mode = 2
-theme_override_constants/separation = 16
-
-[node name="VolumeLabel" type="Label" parent="SettingsPanel/Panel/Margin/VBox/VolumeRow" unique_id=1895332370]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_colors/font_color = Color(1, 0.95, 0.82, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 4
-theme_override_fonts/font = ExtResource("3_font")
-theme_override_font_sizes/font_size = 22
-text = "VOLUME"
-vertical_alignment = 1
-
-[node name="VolumeSlider" type="HSlider" parent="SettingsPanel/Panel/Margin/VBox/VolumeRow" unique_id=367126421]
-custom_minimum_size = Vector2(240, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 4
-max_value = 1.0
-step = 0.01
-value = 1.0
-
-[node name="FullscreenRow" type="HBoxContainer" parent="SettingsPanel/Panel/Margin/VBox" unique_id=498337663]
-layout_mode = 2
-theme_override_constants/separation = 16
-
-[node name="FullscreenLabel" type="Label" parent="SettingsPanel/Panel/Margin/VBox/FullscreenRow" unique_id=610930480]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_colors/font_color = Color(1, 0.95, 0.82, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 4
-theme_override_fonts/font = ExtResource("3_font")
-theme_override_font_sizes/font_size = 22
-text = "TELA CHEIA"
-vertical_alignment = 1
-
-[node name="FullscreenCheck" type="CheckBox" parent="SettingsPanel/Panel/Margin/VBox/FullscreenRow" unique_id=1671638968]
-layout_mode = 2
-size_flags_vertical = 4
-
-[node name="BackButton" type="Button" parent="SettingsPanel/Panel/Margin/VBox" unique_id=206617535]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.95, 0.82, 1)
-theme_override_colors/font_focus_color = Color(1, 0.78, 0.36, 1)
-theme_override_colors/font_pressed_color = Color(1, 0.78, 0.36, 1)
-theme_override_colors/font_hover_color = Color(1, 0.78, 0.36, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 5
-theme_override_fonts/font = ExtResource("3_font")
-theme_override_font_sizes/font_size = 30
-theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
-text = "VOLTAR"
 flat = true
 
 [node name="FadeOverlay" type="ColorRect" parent="." unique_id=704687274]

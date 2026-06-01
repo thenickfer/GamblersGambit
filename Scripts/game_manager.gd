@@ -24,8 +24,6 @@ enum BattleState { SETUP, PLAYER_TURN, CPU_TURN, ENDED }
 
 var battle_state: int = BattleState.SETUP
 var turn_number: int = 1
-var player_attack_bonus: int = 0
-var cpu_attack_penalty: int = 0
 var temp_cards: Array = []  # efeitos de varios turnos ativos (mostrados como texto nos StatusLabel)
 var status_by_combatant := {}
 
@@ -181,22 +179,19 @@ func _show_cpu_card_preview(card_name: String) -> void:
 
 func _place_temp_card(card_node, source) -> void:
 	if card_node.card_action == CardDB.Action.BUFF:
-		_register_status(source, "Furia", card_node.card_turns)
-		if source == player_combatant:
-			player_attack_bonus += card_node.card_value
+		_register_status(source, card_node.card_name, card_node.card_turns, card_node.card_value, true)
 	if card_node.card_action == CardDB.Action.DEBUFF:
-		_register_status(_other_combatant(source), "Veneno", card_node.card_turns)
-		if source == player_combatant:
-			cpu_attack_penalty += card_node.card_value
+		_register_status(_other_combatant(source), card_node.card_name, card_node.card_turns, card_node.card_value, false)
 
 	temp_cards.append({"action": card_node.card_action, "value": card_node.card_value, "remaining": card_node.card_turns, "owner": source})
 	_refresh_status_labels()
+	_refresh_turn_label()
 
-func _register_status(combatant, status_name: String, turns: int) -> void:
+func _register_status(combatant, status_name: String, turns: int, value: int, is_positive: bool) -> void:
 	var key = str(combatant.get_instance_id())
 	if not status_by_combatant.has(key):
 		status_by_combatant[key] = []
-	status_by_combatant[key].append({"name": status_name, "turns": turns})
+	status_by_combatant[key].append({"name": status_name, "turns": turns, "value": value, "is_positive": is_positive})
 
 func _tick_temp_cards() -> void:
 	var still_active = []
@@ -204,11 +199,10 @@ func _tick_temp_cards() -> void:
 		entry.remaining -= 1
 		if entry.remaining > 0:
 			still_active.append(entry)
-		else:
-			_expire_temp_card(entry)
 	temp_cards = still_active
 	_tick_statuses()
 	_refresh_status_labels()
+	_refresh_turn_label()
 
 func _tick_statuses() -> void:
 	for key in status_by_combatant.keys():
@@ -229,8 +223,10 @@ func _format_statuses_for(combatant) -> String:
 		return ""
 	var pieces: Array[String] = []
 	for status in status_by_combatant[key]:
-		pieces.append("[■] %s(%d)" % [status.name, status.turns])
-	return "  ".join(pieces)
+		var sign_txt = "+" if status.is_positive else "-"
+		var turno_txt = "turno" if status.turns == 1 else "turnos"
+		pieces.append("%s%d %s (%d %s)" % [sign_txt, status.value, status.name, status.turns, turno_txt])
+	return "\n".join(pieces)
 
 func _show_health_delta(combatant, delta: int) -> void:
 	if delta == 0:
@@ -255,19 +251,21 @@ func _show_health_delta(combatant, delta: int) -> void:
 		label.position = start_pos
 	)
 
-func _expire_temp_card(entry) -> void:
-	if entry.owner == player_combatant and entry.action == CardDB.Action.BUFF:
-		player_attack_bonus -= entry.value
-	elif entry.owner == player_combatant and entry.action == CardDB.Action.DEBUFF:
-		cpu_attack_penalty -= entry.value
-
 func _other_combatant(combatant):
 	return cpu_combatant if combatant == player_combatant else player_combatant
 
+# Soma o valor de todas as cartas temporarias ativas de um dono e tipo de acao.
+func _sum_temp(owner, action) -> int:
+	var total = 0
+	for entry in temp_cards:
+		if entry.owner == owner and entry.action == action:
+			total += entry.value
+	return total
+
+# Modificador liquido de ataque de um combatente:
+# soma dos buffs nele MENOS soma dos debuffs aplicados nele (jogados pelo oponente).
 func get_attack_bonus(source) -> int:
-	if source == player_combatant:
-		return player_attack_bonus
-	return 0
+	return _sum_temp(source, CardDB.Action.BUFF) - _sum_temp(_other_combatant(source), CardDB.Action.DEBUFF)
 
 func _on_combatant_died(_combatant) -> void:
 	_check_battle_end()
@@ -347,8 +345,10 @@ func _on_back_to_menu_pressed() -> void:
 
 func _refresh_turn_label() -> void:
 	var txt = "Turno: %d" % turn_number
-	if player_attack_bonus > 0:
-		txt += "\nMeu ataque: +%d" % player_attack_bonus
-	if cpu_attack_penalty > 0:
-		txt += "\nAtaque inimigo: -%d" % cpu_attack_penalty
+	var my_attack = get_attack_bonus(player_combatant)
+	var enemy_attack = get_attack_bonus(cpu_combatant)
+	if my_attack != 0:
+		txt += "\nMeu ataque: %+d" % my_attack
+	if enemy_attack != 0:
+		txt += "\nAtaque inimigo: %+d" % enemy_attack
 	turn_label.text = txt
