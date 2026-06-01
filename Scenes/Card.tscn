@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://ckontv23rl71h"]
 
-[ext_resource type="Texture2D" uid="uid://dkfq7arrasinv" path="res://Assets/card_placeholder.png" id="1_dd2wi"]
 [ext_resource type="Script" uid="uid://ceh6bjt1cthey" path="res://Scripts/Card.gd" id="1_hael8"]
+[ext_resource type="PackedScene" uid="uid://c42ugbp5qag2k" path="res://Scenes/CardImage.tscn" id="2_cardimage"]
 [ext_resource type="Texture2D" uid="uid://di1tursqm0g2v" path="res://Assets/Back.png" id="3_h8wm0"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hael8"]
@@ -31,7 +31,7 @@ tracks/1/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [0]
+"values": [-1]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
@@ -43,7 +43,7 @@ tracks/2/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [-1]
+"values": [0]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
@@ -120,12 +120,12 @@ _data = {
 position = Vector2(150, 950)
 script = ExtResource("1_hael8")
 
-[node name="CardImage" type="Sprite2D" parent="." unique_id=1429810445]
-z_index = -1
-texture = ExtResource("1_dd2wi")
-
 [node name="CardImageBack" type="Sprite2D" parent="." unique_id=557772291]
+visible = false
+z_index = -1
 texture = ExtResource("3_h8wm0")
+
+[node name="CardImage" parent="." unique_id=1429810445 instance=ExtResource("2_cardimage")]
 
 [node name="Area2D" type="Area2D" parent="." unique_id=1180995550]
 
@@ -133,43 +133,43 @@ texture = ExtResource("3_h8wm0")
 shape = SubResource("RectangleShape2D_hael8")
 
 [node name="Nome" type="Label" parent="." unique_id=105035912]
-offset_left = -67.0
-offset_top = -59.0
-offset_right = 69.0
-offset_bottom = -37.0
+offset_left = -58.0
+offset_top = -92.0
+offset_right = 56.0
+offset_bottom = -74.0
 theme_override_colors/font_color = Color(0.16, 0.1, 0.06, 1)
-theme_override_font_sizes/font_size = 15
+theme_override_font_sizes/font_size = 13
 text = "NOME"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Valor" type="Label" parent="." unique_id=1959246517]
-offset_left = -61.0
-offset_top = 16.0
-offset_right = 65.0
-offset_bottom = 36.0
+offset_left = -59.0
+offset_top = 11.0
+offset_right = 67.0
+offset_bottom = 31.0
 theme_override_colors/font_color = Color(0.16, 0.1, 0.06, 1)
 theme_override_font_sizes/font_size = 14
 text = "VALOR: X"
 vertical_alignment = 1
 
 [node name="Turnos" type="Label" parent="." unique_id=2138472287]
-offset_left = -61.0
-offset_top = 36.0
-offset_right = 65.0
-offset_bottom = 56.0
+offset_left = -60.0
+offset_top = 42.0
+offset_right = 66.0
+offset_bottom = 62.0
 theme_override_colors/font_color = Color(0.16, 0.1, 0.06, 1)
 theme_override_font_sizes/font_size = 14
 text = "TURNOS: X"
 vertical_alignment = 1
 
 [node name="Tipo" type="Label" parent="." unique_id=130153369]
-offset_left = -68.0
-offset_top = 69.0
-offset_right = 68.0
-offset_bottom = 91.0
+offset_left = -17.0
+offset_top = 76.0
+offset_right = 17.0
+offset_bottom = 89.0
 theme_override_colors/font_color = Color(0.16, 0.1, 0.06, 1)
-theme_override_font_sizes/font_size = 15
+theme_override_font_sizes/font_size = 7
 text = "TIPO"
 horizontal_alignment = 1
 vertical_alignment = 1
