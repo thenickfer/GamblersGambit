@@ -1,0 +1,57 @@
+[gd_scene format=3 uid="uid://bt4qsmdyo261b"]
+
+[ext_resource type="Script" uid="uid://b0udr3vhtrt4x" path="res://Scripts/card_manager.gd" id="2_3wmv5"]
+[ext_resource type="PackedScene" uid="uid://ckontv23rl71h" path="res://Scenes/Card.tscn" id="3_42vr3"]
+[ext_resource type="PackedScene" uid="uid://chrbko46y0tm" path="res://Scenes/CardSlot.tscn" id="5_42vr3"]
+[ext_resource type="Script" uid="uid://5gkydk20d3wg" path="res://Scripts/player_hand.gd" id="5_kdtpo"]
+
+[sub_resource type="GDScript" id="GDScript_3wmv5"]
+script/source = "extends Node2D
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	pass
+
+
+
+
+# card.gd (attached to Area2D)
+#extends Area2D
+#
+#func _ready():
+	#mouse_entered.connect(_on_mouse_entered)
+	#mouse_exited.connect(_on_mouse_exited)
+	#input_event.connect(_on_input_event)
+#
+#func _on_mouse_entered():
+	#create_tween().tween_property(self, \"scale\", Vector2(1.1, 1.1), 0.2)
+#
+#func _on_mouse_exited():
+	#create_tween().tween_property(self, \"scale\", Vector2(1, 1), 0.2)
+#
+#func _on_input_event(event):
+	#if event is InputEventMouseButton and event.pressed:
+		#print(\"Clicou na carta!\")
+"
+
+[node name="Main" type="Node2D" unique_id=435446635]
+script = SubResource("GDScript_3wmv5")
+
+[node name="CardManager" type="Node2D" parent="." unique_id=1688622068]
+script = ExtResource("2_3wmv5")
+
+[node name="Card" parent="CardManager" unique_id=538932331 instance=ExtResource("3_42vr3")]
+visible = false
+position = Vector2(192, 548)
+
+[node name="CardSlot" parent="." unique_id=371871446 instance=ExtResource("5_42vr3")]
+position = Vector2(570, 242)
+
+[node name="PlayerHand" type="Node2D" parent="." unique_id=761351319]
+script = ExtResource("5_kdtpo")

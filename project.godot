@@ -13,7 +13,13 @@ config_version=5
 config/name="Novo Projeto de Jogo"
 run/main_scene="res://src/scenes/title_screen/title_screen.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
-config/icon="res://icon.svg"
+
+[display]
+
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+window/stretch/mode="canvas_items"
+window/stretch/aspect="keep"
 
 [physics]
 

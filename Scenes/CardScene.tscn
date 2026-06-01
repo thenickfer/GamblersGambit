@@ -1,0 +1,136 @@
+[gd_scene format=3 uid="uid://bt4qsmdyo261b"]
+
+[ext_resource type="Script" uid="uid://b0udr3vhtrt4x" path="res://Scripts/card_manager.gd" id="2_3wmv5"]
+[ext_resource type="Texture2D" uid="uid://e4ysn5wfq54" path="res://Assets/deck_placeholder.png" id="4_kkp5k"]
+[ext_resource type="Script" uid="uid://c5xds8gd2ov3l" path="res://Scripts/deck.gd" id="4_qnx4h"]
+[ext_resource type="PackedScene" uid="uid://chrbko46y0tm" path="res://Scenes/CardSlot.tscn" id="5_42vr3"]
+[ext_resource type="Script" uid="uid://5gkydk20d3wg" path="res://Scripts/player_hand.gd" id="5_kdtpo"]
+[ext_resource type="Script" uid="uid://6f1h2c834lxb" path="res://Scripts/input_manager.gd" id="6_kiwwe"]
+[ext_resource type="Texture2D" uid="uid://c8qjav1rnwrhr" path="res://Assets/card_slot_placeholder.png" id="7_slotbg"]
+[ext_resource type="Script" uid="uid://cvi4ygvi80o8" path="res://Scripts/combatant.gd" id="8_cmbt"]
+[ext_resource type="Script" uid="uid://c5xybp6y6cf3q" path="res://Scripts/game_manager.gd" id="9_gm"]
+[ext_resource type="Texture2D" uid="uid://bx5pyf0idasgg" path="res://Assets/CartasTemporarias_Placeholder.png" id="10_temp"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_kkp5k"]
+size = Vector2(150, 200)
+
+[node name="Main" type="Node2D" unique_id=435446635]
+script = ExtResource("9_gm")
+metadata/_edit_horizontal_guides_ = [268.0, 752.0]
+
+[node name="CardManager" type="Node2D" parent="." unique_id=1688622068]
+script = ExtResource("2_3wmv5")
+
+[node name="SlotBackground" type="Sprite2D" parent="." unique_id=900100200]
+z_index = -1
+position = Vector2(960, 510)
+texture = ExtResource("7_slotbg")
+
+[node name="TempCardsBoard" type="Sprite2D" parent="." unique_id=900100201]
+z_index = -1
+position = Vector2(187, 509)
+rotation = -1.5707964
+texture = ExtResource("10_temp")
+
+[node name="PlayerTempSlots" type="Node2D" parent="." unique_id=1356773653]
+position = Vector2(199, 727)
+rotation = -1.5707964
+
+[node name="Slot0" type="Marker2D" parent="PlayerTempSlots" unique_id=1229247587]
+position = Vector2(39.999996, 52)
+scale = Vector2(0.54, 0.54)
+
+[node name="Slot1" type="Marker2D" parent="PlayerTempSlots" unique_id=1025381305]
+position = Vector2(129, 52)
+scale = Vector2(0.54, 0.54)
+
+[node name="Slot2" type="Marker2D" parent="PlayerTempSlots" unique_id=2060807567]
+position = Vector2(218, 52)
+scale = Vector2(0.54, 0.54)
+
+[node name="Slot3" type="Marker2D" parent="PlayerTempSlots" unique_id=2074534713]
+position = Vector2(307, 52)
+scale = Vector2(0.54, 0.54)
+
+[node name="Slot4" type="Marker2D" parent="PlayerTempSlots" unique_id=1832817253]
+position = Vector2(396, 52)
+scale = Vector2(0.54, 0.54)
+
+[node name="PlayerSlot" parent="." unique_id=1365476113 instance=ExtResource("5_42vr3")]
+visible = false
+position = Vector2(695, 505)
+drop_area_size = Vector2(1227, 480)
+drop_area_offset = Vector2(265, 5)
+
+[node name="OpponentSlot" parent="." unique_id=760690296 instance=ExtResource("5_42vr3")]
+visible = false
+position = Vector2(1196, 503)
+is_player_slot = false
+
+[node name="PlayerHand" type="Node2D" parent="." unique_id=761351319]
+script = ExtResource("5_kdtpo")
+
+[node name="Deck" type="Node2D" parent="." unique_id=223496872]
+position = Vector2(150, 950)
+script = ExtResource("4_qnx4h")
+
+[node name="Sprite2D" type="Sprite2D" parent="Deck" unique_id=1057648162]
+texture = ExtResource("4_kkp5k")
+
+[node name="Area2D" type="Area2D" parent="Deck" unique_id=1309199309]
+collision_layer = 4
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Deck/Area2D" unique_id=1550711039]
+shape = SubResource("RectangleShape2D_kkp5k")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Deck" unique_id=825749417]
+modulate = Color(0, 0, 0, 1)
+offset_left = -17.0
+offset_top = -26.0
+offset_right = 18.0
+offset_bottom = 24.0
+theme_override_font_sizes/normal_font_size = 32
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="InputManager" type="Node2D" parent="." unique_id=642366794]
+position = Vector2(150, 890)
+script = ExtResource("6_kiwwe")
+
+[node name="PlayerStats" type="Label" parent="." unique_id=2086271339]
+offset_left = 41.0
+offset_top = 31.0
+offset_right = 165.0
+offset_bottom = 220.0
+theme_override_font_sizes/font_size = 32
+text = "Player
+
+Vida:
+Energia:"
+script = ExtResource("8_cmbt")
+start_health = 10
+
+[node name="OpponentStats" type="Label" parent="." unique_id=437947903]
+offset_left = 1657.0
+offset_top = 31.0
+offset_right = 1881.0
+offset_bottom = 220.0
+theme_override_font_sizes/font_size = 32
+text = "Inimigo
+
+:Vida
+:Energia"
+horizontal_alignment = 2
+script = ExtResource("8_cmbt")
+combatant_name = "Inimigo"
+
+[node name="TurnLabel" type="Label" parent="." unique_id=512094871]
+offset_left = 760.0
+offset_top = 20.0
+offset_right = 1160.0
+offset_bottom = 200.0
+theme_override_font_sizes/font_size = 34
+text = "Turno: 1"
+horizontal_alignment = 1
