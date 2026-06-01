@@ -71,31 +71,101 @@ vertical_alignment = 1
 position = Vector2(150, 890)
 script = ExtResource("6_kiwwe")
 
-[node name="PlayerStats" type="Label" parent="." unique_id=2086271339]
+[node name="PlayerStats" type="VBoxContainer" parent="." unique_id=2086271339]
 offset_left = 41.0
 offset_top = 31.0
-offset_right = 165.0
-offset_bottom = 220.0
-theme_override_font_sizes/font_size = 32
-text = "Player
-
-Vida:
-Energia:"
+offset_right = 341.0
+offset_bottom = 169.0
+theme_override_constants/separation = 10
 script = ExtResource("8_cmbt")
 
-[node name="OpponentStats" type="Label" parent="." unique_id=437947903]
-offset_left = 1657.0
+[node name="NameLabel" type="Label" parent="PlayerStats"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Player"
+
+[node name="HealthBar" type="ProgressBar" parent="PlayerStats"]
+custom_minimum_size = Vector2(300, 42)
+layout_mode = 2
+show_percentage = false
+
+[node name="ValueLabel" type="Label" parent="PlayerStats/HealthBar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 22
+text = "Vida: 20/20"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EnergyBar" type="ProgressBar" parent="PlayerStats"]
+custom_minimum_size = Vector2(300, 42)
+layout_mode = 2
+show_percentage = false
+
+[node name="ValueLabel" type="Label" parent="PlayerStats/EnergyBar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 22
+text = "Energia: 10/10"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="OpponentStats" type="VBoxContainer" parent="." unique_id=437947903]
+offset_left = 1579.0
 offset_top = 31.0
 offset_right = 1881.0
-offset_bottom = 220.0
-theme_override_font_sizes/font_size = 32
-text = "Inimigo
-
-:Vida
-:Energia"
-horizontal_alignment = 2
+offset_bottom = 169.0
+theme_override_constants/separation = 10
 script = ExtResource("8_cmbt")
 combatant_name = "Inimigo"
+
+[node name="NameLabel" type="Label" parent="OpponentStats"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Inimigo"
+horizontal_alignment = 2
+
+[node name="HealthBar" type="ProgressBar" parent="OpponentStats"]
+custom_minimum_size = Vector2(300, 42)
+layout_mode = 2
+show_percentage = false
+
+[node name="ValueLabel" type="Label" parent="OpponentStats/HealthBar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 22
+text = "Vida: 20/20"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EnergyBar" type="ProgressBar" parent="OpponentStats"]
+custom_minimum_size = Vector2(300, 42)
+layout_mode = 2
+show_percentage = false
+
+[node name="ValueLabel" type="Label" parent="OpponentStats/EnergyBar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 22
+text = "Energia: 10/10"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="TurnLabel" type="Label" parent="." unique_id=512094871]
 offset_left = 760.0

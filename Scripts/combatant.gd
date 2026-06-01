@@ -1,4 +1,4 @@
-extends Label
+extends VBoxContainer
 
 signal died(combatant)
 
@@ -15,6 +15,12 @@ var deck: Array[String] = []
 var initial_deck: Array[String] = []  # copia das cartas iniciais para reiniciar o deck
 var discard: Array = []
 var is_alive: bool = true
+
+@onready var name_label: Label = $NameLabel
+@onready var health_bar: ProgressBar = $HealthBar
+@onready var health_label: Label = $HealthBar/ValueLabel
+@onready var energy_bar: ProgressBar = $EnergyBar
+@onready var energy_label: Label = $EnergyBar/ValueLabel
 
 func _ready() -> void:
 	current_health = start_health if start_health >= 0 else max_health
@@ -48,6 +54,12 @@ func gain_energy(amount: int) -> void:
 	current_energy = clampi(current_energy + amount, 0, max_energy)
 	_refresh()
 
+func spend_energy(amount: int) -> void:
+	current_energy = clampi(current_energy - amount, 0, max_energy)
+	if current_energy == 0:
+		current_energy = max_energy
+	_refresh()
+
 func draw_random_card() -> String:
 	# quando o deck acaba, reinicia com as mesmas cartas iniciais
 	if deck.is_empty():
@@ -71,4 +83,10 @@ func add_to_discard(card_ref) -> void:
 	discard.append(card_ref)
 
 func _refresh() -> void:
-	text = "%s\nVida: %d/%d\nEnergia: %d/%d" % [combatant_name, current_health, max_health, current_energy, max_energy]
+	name_label.text = combatant_name
+	health_bar.max_value = max_health
+	health_bar.value = current_health
+	health_label.text = "Vida: %d/%d" % [current_health, max_health]
+	energy_bar.max_value = max_energy
+	energy_bar.value = current_energy
+	energy_label.text = "Energia: %d/%d" % [current_energy, max_energy]

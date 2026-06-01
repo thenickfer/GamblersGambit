@@ -87,6 +87,7 @@ func _process_card_play(source, target, card_node) -> bool:
 	var before_health: int = target.current_health
 	var before_source_health: int = source.current_health
 
+	source.spend_energy(1)
 	var effect = EFFECTS[card_node.card_action].new()
 	effect.execute({"game_manager": self, "source": source, "target": target, "card": card_node})
 
