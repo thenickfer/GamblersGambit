@@ -11,7 +11,7 @@ var center_screen_x
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	center_screen_x = get_viewport().size.x /2
+	center_screen_x = $HandCenter.global_position.x
 		
 func add_card_to_hand(card, speed):
 	if card not in player_hand:

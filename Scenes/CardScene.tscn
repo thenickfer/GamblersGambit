@@ -24,7 +24,6 @@ z_index = -1
 position = Vector2(960, 510)
 texture = ExtResource("7_slotbg")
 
-
 [node name="PlayerSlot" parent="." unique_id=1365476113 instance=ExtResource("5_42vr3")]
 visible = false
 position = Vector2(695, 505)
@@ -38,6 +37,9 @@ is_player_slot = false
 
 [node name="PlayerHand" type="Node2D" parent="." unique_id=761351319]
 script = ExtResource("5_kdtpo")
+
+[node name="HandCenter" type="Node2D" parent="PlayerHand" unique_id=1333298199]
+position = Vector2(960, 1040)
 
 [node name="Deck" type="Node2D" parent="." unique_id=223496872]
 position = Vector2(150, 950)
@@ -71,31 +73,101 @@ vertical_alignment = 1
 position = Vector2(150, 890)
 script = ExtResource("6_kiwwe")
 
-[node name="PlayerStats" type="Label" parent="." unique_id=2086271339]
+[node name="PlayerStats" type="VBoxContainer" parent="." unique_id=2086271339]
 offset_left = 41.0
 offset_top = 31.0
-offset_right = 165.0
-offset_bottom = 220.0
-theme_override_font_sizes/font_size = 32
-text = "Player
-
-Vida:
-Energia:"
+offset_right = 341.0
+offset_bottom = 169.0
+theme_override_constants/separation = 10
 script = ExtResource("8_cmbt")
 
-[node name="OpponentStats" type="Label" parent="." unique_id=437947903]
-offset_left = 1657.0
+[node name="NameLabel" type="Label" parent="PlayerStats" unique_id=2023062085]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Player"
+
+[node name="HealthBar" type="ProgressBar" parent="PlayerStats" unique_id=359939162]
+custom_minimum_size = Vector2(300, 42)
+layout_mode = 2
+show_percentage = false
+
+[node name="ValueLabel" type="Label" parent="PlayerStats/HealthBar" unique_id=1765676857]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 22
+text = "Vida: 20/20"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EnergyBar" type="ProgressBar" parent="PlayerStats" unique_id=755758424]
+custom_minimum_size = Vector2(300, 42)
+layout_mode = 2
+show_percentage = false
+
+[node name="ValueLabel" type="Label" parent="PlayerStats/EnergyBar" unique_id=70675409]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 22
+text = "Energia: 10/10"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="OpponentStats" type="VBoxContainer" parent="." unique_id=437947903]
+offset_left = 1579.0
 offset_top = 31.0
 offset_right = 1881.0
-offset_bottom = 220.0
-theme_override_font_sizes/font_size = 32
-text = "Inimigo
-
-:Vida
-:Energia"
-horizontal_alignment = 2
+offset_bottom = 169.0
+theme_override_constants/separation = 10
 script = ExtResource("8_cmbt")
 combatant_name = "Inimigo"
+
+[node name="NameLabel" type="Label" parent="OpponentStats" unique_id=295554465]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Inimigo"
+horizontal_alignment = 2
+
+[node name="HealthBar" type="ProgressBar" parent="OpponentStats" unique_id=222134758]
+custom_minimum_size = Vector2(300, 42)
+layout_mode = 2
+show_percentage = false
+
+[node name="ValueLabel" type="Label" parent="OpponentStats/HealthBar" unique_id=624919172]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 22
+text = "Vida: 20/20"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EnergyBar" type="ProgressBar" parent="OpponentStats" unique_id=2107903764]
+custom_minimum_size = Vector2(300, 42)
+layout_mode = 2
+show_percentage = false
+
+[node name="ValueLabel" type="Label" parent="OpponentStats/EnergyBar" unique_id=1750376364]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 22
+text = "Energia: 10/10"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="TurnLabel" type="Label" parent="." unique_id=512094871]
 offset_left = 760.0
@@ -112,9 +184,8 @@ offset_top = 540.0
 offset_right = 1880.0
 offset_bottom = 1000.0
 theme_override_font_sizes/font_size = 20
-horizontal_alignment = 2
-vertical_alignment = 0
 text = "Mao CPU:"
+horizontal_alignment = 2
 
 [node name="PlayerFxLabel" type="Label" parent="." unique_id=777001]
 visible = false
@@ -140,7 +211,6 @@ offset_top = 230.0
 offset_right = 700.0
 offset_bottom = 500.0
 theme_override_font_sizes/font_size = 24
-text = ""
 
 [node name="OpponentStatusLabel" type="Label" parent="." unique_id=777004]
 offset_left = 1200.0
@@ -149,4 +219,3 @@ offset_right = 1880.0
 offset_bottom = 500.0
 theme_override_font_sizes/font_size = 24
 horizontal_alignment = 2
-text = ""
