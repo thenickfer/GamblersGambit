@@ -27,8 +27,8 @@ var turn_number: int = 1
 var temp_cards: Array = []  # efeitos de varios turnos ativos (mostrados como texto nos StatusLabel)
 var status_by_combatant := {}
 
-@onready var player_combatant = $PlayerStats
-@onready var cpu_combatant = $OpponentStats
+@onready var player_combatant: Combatant = $PlayerStats
+@onready var cpu_combatant: CPUCombatant = $OpponentStats
 @onready var turn_label = $TurnLabel
 @onready var card_manager = $CardManager
 @onready var player_hand = $PlayerHand
@@ -62,11 +62,13 @@ func _setup_combatants() -> void:
 	]
 	player_combatant.setup_deck(player_cards)
 	cpu_combatant.setup_deck(cpu_cards)
+	cpu_combatant.setup_ai(1)
 	for _i in range(MAX_HAND_SIZE):
 		deck_node.draw_card()
 		draw_cpu_card()
-
+var battle_context_for_cpu: Dictionary
 func try_play_player_card(card_node) -> Dictionary:
+	battle_context_for_cpu = _build_battle_context()
 	if battle_state != BattleState.PLAYER_TURN or battle_state == BattleState.ENDED:
 		return {"accepted": false, "went_to_board": false}
 
@@ -106,16 +108,48 @@ func _end_player_turn() -> void:
 	if not _check_battle_end():
 		_cpu_take_turn()
 
+func _get_status_snapshot(combatant) -> Array:
+	var key := str(combatant.get_instance_id())
+
+	if !status_by_combatant.has(key):
+		return []
+
+	return status_by_combatant[key].duplicate(true)
+
+func _build_battle_context() -> Dictionary:
+	return {
+		"turn_number": turn_number,
+
+		"self": {
+			"health": cpu_combatant.current_health,
+			"max_health": cpu_combatant.max_health,
+			"energy": cpu_combatant.current_energy,
+			"hand": cpu_combatant.hand.duplicate(),
+			"attack_bonus": get_attack_bonus(cpu_combatant),
+		},
+
+		"enemy": {
+			"health": player_combatant.current_health,
+			"max_health": player_combatant.max_health,
+			"energy": player_combatant.current_energy,
+			"hand_size": player_combatant.hand.size(),
+			"attack_bonus": get_attack_bonus(player_combatant),
+		},
+
+		"statuses": {
+			"self": _get_status_snapshot(cpu_combatant),
+			"enemy": _get_status_snapshot(player_combatant),
+		}
+	}
+
 func _cpu_take_turn() -> void:
 	if battle_state == BattleState.ENDED:
 		return
-	if cpu_combatant.hand.is_empty():
-		draw_cpu_card()
-	if cpu_combatant.hand.is_empty():
-		_end_cpu_turn()
-		return
+	
 
-	var idx = randi_range(0, cpu_combatant.hand.size() - 1)
+	var decision: int = cpu_combatant.take_action(battle_context_for_cpu)
+
+	var idx = clampi(decision, 0, cpu_combatant.hand.size()-1)
 	var card_name: String = cpu_combatant.hand[idx]
 	cpu_combatant.hand.remove_at(idx)
 	_refresh_opponent_hand_label()

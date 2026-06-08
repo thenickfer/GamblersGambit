@@ -1,4 +1,4 @@
-extends VBoxContainer
+class_name Combatant extends VBoxContainer
 
 signal died(combatant)
 

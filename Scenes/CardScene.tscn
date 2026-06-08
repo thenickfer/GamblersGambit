@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://6f1h2c834lxb" path="res://Scripts/input_manager.gd" id="6_kiwwe"]
 [ext_resource type="Texture2D" uid="uid://c8qjav1rnwrhr" path="res://Assets/card_slot_placeholder.png" id="7_slotbg"]
 [ext_resource type="Script" uid="uid://cvi4ygvi80o8" path="res://Scripts/combatant.gd" id="8_cmbt"]
+[ext_resource type="Script" uid="uid://yqe030cspifa" path="res://Scripts/cpu_combatant.gd" id="9_3cu1b"]
 [ext_resource type="Script" uid="uid://c5xybp6y6cf3q" path="res://Scripts/game_manager.gd" id="9_gm"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kkp5k"]
@@ -126,8 +127,7 @@ offset_top = 31.0
 offset_right = 1881.0
 offset_bottom = 169.0
 theme_override_constants/separation = 10
-script = ExtResource("8_cmbt")
-combatant_name = "Inimigo"
+script = ExtResource("9_3cu1b")
 
 [node name="NameLabel" type="Label" parent="OpponentStats" unique_id=295554465]
 layout_mode = 2
