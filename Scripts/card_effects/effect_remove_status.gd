@@ -1,9 +1,8 @@
 extends "res://Scripts/card_effects/effect_base.gd"
 
-# Concede (ou rouba, com value negativo) energia ao alvo.
-# Padrão: quem joga a carta ("self"). Use target "enemy" para roubo de fichas.
+# Remove ou reduz um status pelo id. amount < 0 remove totalmente; amount >= 0 reduz o value.
 func execute(context: Dictionary) -> void:
 	var gm = context.game_manager
 	var params: Dictionary = context.params
 	var target = gm.resolve_target(context, params.get("target", "self"))
-	target.gain_energy(int(params.get("value", 0)))
+	gm.remove_status(target, String(params.get("id", "")), int(params.get("amount", -1)))
