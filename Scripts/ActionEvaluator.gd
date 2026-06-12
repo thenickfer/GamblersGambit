@@ -21,22 +21,31 @@ static func _score_card(card: Dictionary, state: Dictionary) -> float:
 
 	match card.action:
 		CardDB.Action.ATTACK:
-			score += card.value
-
-			if enemy_hp <= card.value:
-				score += 1000000
+			for effect in card.effects:
+				if effect.kind == "damage":
+					score += effect.value
+					if enemy_hp <= effect.value:
+						score += 1000000
 
 		CardDB.Action.CURE:
 			score += max(0, 100 - my_hp) * 0.5
-			score += card.value
+			for effect in card.effects:
+				if effect.kind == "heal":
+					score += effect.value
 
 		CardDB.Action.DEFENCE:
-			score += card.value
-
+			for effect in card.effects:
+				if effect.kind == "block":
+					score += effect.value
+				
 		CardDB.Action.BUFF:
-			score += card.value * 2
+			var aux := 3 if (state.battle_context.turn_number < 5) else 1
+			for effect in card.effects:
+				score += effect.status.value * (aux + effect.status.turns)
+			
 
 		CardDB.Action.DEBUFF:
-			score += card.value * 2
+			for effect in card.effects:
+				score += effect.status.value * 2 + effect.status.turns
 
 	return score

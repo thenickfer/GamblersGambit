@@ -7,9 +7,9 @@ const CardDB = preload("res://Scripts/card_db.gd")
 
 var starting_position
 var card_name: String
-var card_action: int
-var card_value: int
-var card_turns: int  # turnos que o efeito dura (0 = instantâneo)
+var card_type: int       # Action (categoria; rótulo "Tipo" e arte padrão)
+var card_cost            # energia gasta ao jogar (int, ou "X" = toda a energia)
+var card_effects: Array  # lista de efeitos aplicados ao jogar (ver card_db.gd)
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -18,15 +18,15 @@ func _ready() -> void:
 # Configura a carta a partir de uma entrada do card_db.gd.
 func setup(name: String) -> void:
 	card_name = name
-	var data: Array = CardDB.CARDS[name]
-	card_action = data[0]
-	card_value = data[1]
-	card_turns = data[2]
-	$CardImage.set_nome(card_name)
-	$CardImage.set_value(card_value)
-	$CardImage.set_type(CardDB.ACTION_NAMES[card_action])
-	$CardImage.set_turns(card_turns)
-	var art_path: String = data[3] if data.size() > 3 else CardDB.ACTION_ARTS[card_action]
+	var data: Dictionary = CardDB.CARDS[name]
+	card_type = data.get("type", CardDB.Action.ATTACK)
+	card_cost = data.get("cost", 0)
+	card_effects = data.get("effects", [])
+	$Nome.text = name
+	$Custo.text = str(card_cost)
+	$Descricao.text = data.get("desc", "")
+	$Tipo.text = CardDB.ACTION_NAMES[card_type]
+	var art_path: String = data.get("art", CardDB.ACTION_ARTS[card_type])
 	$CardImage.set_art_from_path(art_path)
 
 

@@ -9,6 +9,12 @@ func _init(difficulty: float) -> void:
 func take_turn(state: Dictionary):
 	var actions = ActionGenerator.generate(state);
 	
+	if(actions.is_empty()):
+		return {
+			"type": "pass_turn",
+			"card_index": -1
+		};
+	
 	var best_action = null;
 	var best_score = -INF;
 	

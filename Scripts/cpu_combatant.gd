@@ -18,15 +18,13 @@ func take_action(context: Dictionary):
 
 func _build_hand_snapshot(hand: Array) -> Array:
 	var cards := []
-
 	for card_name in hand:
 		var data = CardDB.CARDS[card_name]
-
 		cards.append({
 			"name": card_name,
-			"action": data[0],
-			"value": data[1],
-			"turns": data[2]
+			"action": data.type,
+			"cost": data.cost,
+			"effects": data.effects,
 		})
 
 	return cards
