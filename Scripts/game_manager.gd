@@ -39,6 +39,7 @@ const STATUSES = {
 	"dot":      preload("res://Scripts/statuses/status_dot.gd"),
 	"defense":  preload("res://Scripts/statuses/status_defense.gd"),
 	"reflect":  preload("res://Scripts/statuses/status_reflect.gd"),
+	"regen":    preload("res://Scripts/statuses/status_regen.gd"),
 }
 
 enum BattleState { SETUP, PLAYER_TURN, CPU_TURN, ENDED }
@@ -66,7 +67,6 @@ var energy_spent_context: int = 0
 @onready var player_hand = $PlayerHand
 @onready var deck_node = $Deck
 @onready var opponent_slot = $OpponentSlot
-@onready var opponent_hand_label = $OpponentHandLabel
 @onready var player_fx_label = $PlayerFxLabel
 @onready var opponent_fx_label = $OpponentFxLabel
 @onready var player_status_label = $PlayerStatusLabel
@@ -83,7 +83,6 @@ func _ready() -> void:
 	_setup_combatants()
 	battle_state = BattleState.PLAYER_TURN
 	_refresh_turn_label()
-	_refresh_opponent_hand_label()
 	_refresh_status_labels()
 
 func _setup_combatants() -> void:
@@ -91,13 +90,13 @@ func _setup_combatants() -> void:
 		"Espada", "Espada", "Escudo", "Escudo", "Poção", "Fúria", "Veneno",
 		"Bola de Fogo", "Muralha", "Bênção", "Adrenalina", "Maldição", "Bebedeira Total",
 		# cartas novas para exercitar cada mecânica do framework
-		"Cotovelada", "Sangramento Profundo", "Levantar Guarda", "Reflexo de Bar",
+		"Cotovelada", "Corte Profundo", "Levantar Guarda", "Reflexo de Bar",
 		"Carta Marcada", "Moeda da Sorte", "Veneno Fraco",
 	]
 	var cpu_cards: Array[String] = [
 		"Espada", "Escudo", "Poção", "Fúria", "Veneno", "Bola de Fogo", "Muralha",
 		"Bênção", "Adrenalina", "Maldição",
-		"Cotovelada", "Sangramento Profundo", "Levantar Guarda", "Moeda da Sorte",
+		"Cotovelada", "Corte Profundo", "Levantar Guarda", "Moeda da Sorte",
 	]
 	player_combatant.setup_deck(player_cards)
 	cpu_combatant.setup_deck(cpu_cards)
@@ -223,7 +222,6 @@ func _cpu_take_turn() -> void:
 
 	var card_name: String = cpu_combatant.hand[idx]
 	cpu_combatant.hand.remove_at(idx)
-	_refresh_opponent_hand_label()
 	_show_cpu_card_preview(card_name)
 
 	var card_node = _build_virtual_card(card_name)
@@ -285,13 +283,6 @@ func draw_cpu_card() -> void:
 	if cpu_combatant.hand.size() >= MAX_HAND_SIZE:
 		return
 	cpu_combatant.draw_random_card()
-	_refresh_opponent_hand_label()
-
-func _refresh_opponent_hand_label() -> void:
-	var lines: Array[String] = ["Mao CPU:"]
-	for i in range(cpu_combatant.hand.size()):
-		lines.append("%d. %s" % [i + 1, cpu_combatant.hand[i]])
-	opponent_hand_label.text = "\n".join(lines)
 
 func _show_cpu_card_preview(card_name: String) -> void:
 	if opponent_slot.card_in_slot and is_instance_valid(opponent_slot.card_node):
@@ -300,6 +291,7 @@ func _show_cpu_card_preview(card_name: String) -> void:
 	var new_card = card_scene.instantiate()
 	card_manager.add_child(new_card)
 	new_card.setup(card_name)
+	new_card.scale = card_manager.HAND_CARD_SCALE  # mesmo tamanho das cartas grandes (1.5x)
 	new_card.get_node("Area2D/CollisionShape2D").disabled = true
 	new_card.global_position = opponent_slot.get_card_snap_position()
 	opponent_slot.card_in_slot = true
@@ -492,7 +484,6 @@ func discard_cards(combatant, n: int) -> void:
 			var idx = randi_range(0, combatant.hand.size() - 1)
 			combatant.add_to_discard(combatant.hand[idx])
 			combatant.hand.remove_at(idx)
-	_refresh_opponent_hand_label()
 
 func _discard_player_random() -> void:
 	var nodes = player_hand.player_hand
