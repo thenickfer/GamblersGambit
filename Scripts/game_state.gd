@@ -1,6 +1,7 @@
 extends Node
 
 const STARTING_COINS: int = 20
+const WIN_COINS: int = 100
 
 var player_coins: int = STARTING_COINS
 var selected_cpu_assertiveness: float = 0.2
@@ -26,3 +27,9 @@ func resolve_match(player_won: bool) -> void:
 	if player_won:
 		player_coins += current_match_cost * 2
 	current_match_cost = 0
+
+func has_no_coins() -> bool:
+	return player_coins <= 0
+
+func has_winning_coins() -> bool:
+	return player_coins >= WIN_COINS

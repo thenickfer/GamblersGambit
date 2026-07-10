@@ -657,12 +657,16 @@ func _end_battle(winner, loser) -> void:
 # Tela de fim de jogo: vitoria/derrota + botao de voltar ao menu (estilo dos menus).
 func _on_battle_ended(winner, _loser) -> void:
 	GameState.resolve_match(winner == player_combatant)
-	if winner == player_combatant:
+	if GameState.has_winning_coins():
+		_show_end_screen("VOCE VENCEU O JOGO", "Moedas: %d/%d" % [GameState.player_coins, GameState.WIN_COINS])
+	elif GameState.has_no_coins():
+		_show_end_screen("GAME OVER", "Voce ficou sem moedas")
+	elif winner == player_combatant:
 		_show_end_screen("VOCÊ VENCEU")
 	else:
 		_show_end_screen("FIM DE JOGO")
 
-func _show_end_screen(message: String) -> void:
+func _show_end_screen(message: String, detail: String = "") -> void:
 	var layer := CanvasLayer.new()
 	layer.layer = 100
 	layer.process_mode = Node.PROCESS_MODE_ALWAYS
@@ -690,6 +694,17 @@ func _show_end_screen(message: String) -> void:
 	title.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
 	title.add_theme_constant_override("outline_size", 8)
 	vbox.add_child(title)
+
+	if detail != "":
+		var subtitle := Label.new()
+		subtitle.text = detail
+		subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		subtitle.add_theme_font_override("font", MENU_FONT)
+		subtitle.add_theme_font_size_override("font_size", 42)
+		subtitle.add_theme_color_override("font_color", TEXT_COLOR)
+		subtitle.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
+		subtitle.add_theme_constant_override("outline_size", 6)
+		vbox.add_child(subtitle)
 
 	var button := Button.new()
 	button.text = "VOLTAR AO MENU"
