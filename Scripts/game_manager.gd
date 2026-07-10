@@ -277,7 +277,7 @@ func _score_cpu_damage(target, amount: int, ignore_block: bool) -> float:
 	var score := float(damage) * 2.5
 	if damage >= player_combatant.current_health:
 		score += 100.0
-	var player_health_ratio := float(player_combatant.current_health) / max(1.0, float(player_combatant.max_health))
+	var player_health_ratio :float = float(player_combatant.current_health) / max(1.0, float(player_combatant.max_health))
 	if player_health_ratio <= 0.35:
 		score += float(damage) * 1.5
 	return score
@@ -286,7 +286,7 @@ func _score_cpu_heal(target, amount: int) -> float:
 	var missing = max(0, target.max_health - target.current_health)
 	var useful_heal = min(amount, missing)
 	var score := float(useful_heal) * 2.2
-	var health_ratio := float(target.current_health) / max(1.0, float(target.max_health))
+	var health_ratio :float = float(target.current_health) / max(1.0, float(target.max_health))
 	if health_ratio <= 0.35:
 		score *= 1.8
 	return score if target == cpu_combatant else -score
@@ -298,7 +298,7 @@ func _score_cpu_energy(target, amount: int) -> float:
 
 func _score_cpu_block(target, amount: int) -> float:
 	var score := float(amount) * 1.1
-	var cpu_health_ratio := float(cpu_combatant.current_health) / max(1.0, float(cpu_combatant.max_health))
+	var cpu_health_ratio : float = float(cpu_combatant.current_health) / max(1.0, float(cpu_combatant.max_health))
 	if cpu_health_ratio <= 0.4:
 		score *= 1.7
 	return score if target == cpu_combatant else -score
@@ -307,7 +307,7 @@ func _score_cpu_status(target, status_data) -> float:
 	var status: Dictionary = (status_data as Dictionary)
 	var kind := String(status.get("kind", ""))
 	var value := int(status.get("value", 0))
-	var duration := max(1, int(status.get("turns", status.get("charges", 1))))
+	var duration :int = max(1, int(status.get("turns", status.get("charges", 1))))
 	var score := 0.0
 	match kind:
 		"attack":

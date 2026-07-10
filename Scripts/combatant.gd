@@ -16,6 +16,7 @@ var deck: Array[String] = []
 var initial_deck: Array[String] = []  # copia das cartas iniciais para reiniciar o deck
 var discard: Array = []
 var is_alive: bool = true
+var block: int = 0
 
 @onready var name_label: Label = $NameLabel
 @onready var health_bar: ProgressBar = $HealthBar
@@ -38,8 +39,13 @@ func setup_deck(cards: Array) -> void:
 	hand.clear()
 	discard.clear()
 
-func take_damage(amount: int) -> void:
-	current_health = clampi(current_health - amount, 0, max_health)
+func take_damage(amount: int, ignore_block: bool = false) -> void:
+	var remaining_damage := amount
+	if not ignore_block and block > 0:
+		var blocked : int = min(block, remaining_damage)
+		block -= blocked
+		remaining_damage -= blocked
+	current_health = clampi(current_health - remaining_damage, 0, max_health)
 	if current_health <= 0 and is_alive:
 		is_alive = false
 		emit_signal("died", self)
@@ -55,10 +61,21 @@ func gain_energy(amount: int) -> void:
 	current_energy = clampi(current_energy + amount, 0, max_energy)
 	_refresh()
 
+func can_afford(amount: int) -> bool:
+	return current_energy >= amount
+
 func spend_energy(amount: int) -> void:
 	current_energy = clampi(current_energy - amount, 0, max_energy)
 	if current_energy == 0:
 		current_energy = max_energy
+	_refresh()
+
+func add_block(amount: int) -> void:
+	block = max(0, block + amount)
+	_refresh()
+
+func reset_block() -> void:
+	block = 0
 	_refresh()
 
 func draw_random_card() -> String:

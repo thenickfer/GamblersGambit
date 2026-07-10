@@ -1,0 +1,221 @@
+[gd_scene format=3 uid="uid://bt4qsmdyo261b"]
+
+[ext_resource type="Script" uid="uid://b0udr3vhtrt4x" path="res://Scripts/card_manager.gd" id="2_3wmv5"]
+[ext_resource type="Script" uid="uid://c5xds8gd2ov3l" path="res://Scripts/deck.gd" id="4_qnx4h"]
+[ext_resource type="PackedScene" uid="uid://chrbko46y0tm" path="res://Scenes/CardSlot.tscn" id="5_42vr3"]
+[ext_resource type="Script" uid="uid://5gkydk20d3wg" path="res://Scripts/player_hand.gd" id="5_kdtpo"]
+[ext_resource type="Script" uid="uid://6f1h2c834lxb" path="res://Scripts/input_manager.gd" id="6_kiwwe"]
+[ext_resource type="Texture2D" uid="uid://c8qjav1rnwrhr" path="res://Assets/card_slot_placeholder.png" id="7_slotbg"]
+[ext_resource type="Script" uid="uid://cvi4ygvi80o8" path="res://Scripts/combatant.gd" id="8_cmbt"]
+[ext_resource type="Script" uid="uid://c5xybp6y6cf3q" path="res://Scripts/game_manager.gd" id="9_gm"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_kkp5k"]
+size = Vector2(150, 200)
+
+[node name="Main" type="Node2D" unique_id=435446635]
+script = ExtResource("9_gm")
+metadata/_edit_horizontal_guides_ = [268.0, 752.0]
+
+[node name="CardManager" type="Node2D" parent="." unique_id=1688622068]
+script = ExtResource("2_3wmv5")
+
+[node name="SlotBackground" type="Sprite2D" parent="." unique_id=900100200]
+z_index = -1
+position = Vector2(960, 510)
+texture = ExtResource("7_slotbg")
+
+[node name="PlayerSlot" parent="." unique_id=1365476113 instance=ExtResource("5_42vr3")]
+visible = false
+position = Vector2(695, 505)
+drop_area_size = Vector2(1227, 480)
+drop_area_offset = Vector2(265, 5)
+
+[node name="OpponentSlot" parent="." unique_id=760690296 instance=ExtResource("5_42vr3")]
+visible = false
+position = Vector2(1196, 503)
+is_player_slot = false
+
+[node name="PlayerHand" type="Node2D" parent="." unique_id=761351319]
+script = ExtResource("5_kdtpo")
+
+[node name="HandCenter" type="Node2D" parent="PlayerHand" unique_id=1333298199]
+position = Vector2(960, 1040)
+
+[node name="Deck" type="Node2D" parent="." unique_id=223496872]
+position = Vector2(150, 950)
+script = ExtResource("4_qnx4h")
+
+[node name="Sprite2D" type="ColorRect" parent="Deck" unique_id=1057648162]
+offset_left = -75.0
+offset_top = -100.0
+offset_right = 75.0
+offset_bottom = 100.0
+
+[node name="Area2D" type="Area2D" parent="Deck" unique_id=1309199309]
+collision_layer = 4
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Deck/Area2D" unique_id=1550711039]
+shape = SubResource("RectangleShape2D_kkp5k")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Deck" unique_id=825749417]
+modulate = Color(0, 0, 0, 1)
+offset_left = -37.0
+offset_top = -26.0
+offset_right = 38.0
+offset_bottom = 24.0
+theme_override_font_sizes/normal_font_size = 32
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="InputManager" type="Node2D" parent="." unique_id=642366794]
+position = Vector2(150, 890)
+script = ExtResource("6_kiwwe")
+
+[node name="PlayerStats" type="VBoxContainer" parent="." unique_id=2086271339]
+offset_left = 41.0
+offset_top = 31.0
+offset_right = 341.0
+offset_bottom = 169.0
+theme_override_constants/separation = 10
+script = ExtResource("8_cmbt")
+
+[node name="NameLabel" type="Label" parent="PlayerStats" unique_id=2023062085]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Player"
+
+[node name="HealthBar" type="ProgressBar" parent="PlayerStats" unique_id=359939162]
+custom_minimum_size = Vector2(300, 42)
+layout_mode = 2
+show_percentage = false
+
+[node name="ValueLabel" type="Label" parent="PlayerStats/HealthBar" unique_id=1765676857]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 22
+text = "Vida: 20/20"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EnergyBar" type="ProgressBar" parent="PlayerStats" unique_id=755758424]
+custom_minimum_size = Vector2(300, 42)
+layout_mode = 2
+show_percentage = false
+
+[node name="ValueLabel" type="Label" parent="PlayerStats/EnergyBar" unique_id=70675409]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 22
+text = "Energia: 10/10"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="OpponentStats" type="VBoxContainer" parent="." unique_id=437947903]
+offset_left = 1579.0
+offset_top = 31.0
+offset_right = 1881.0
+offset_bottom = 169.0
+theme_override_constants/separation = 10
+script = ExtResource("8_cmbt")
+cpu_pick_assertiveness = 0.75
+
+[node name="NameLabel" type="Label" parent="OpponentStats" unique_id=295554465]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Inimigo"
+horizontal_alignment = 2
+
+[node name="HealthBar" type="ProgressBar" parent="OpponentStats" unique_id=222134758]
+custom_minimum_size = Vector2(300, 42)
+layout_mode = 2
+show_percentage = false
+
+[node name="ValueLabel" type="Label" parent="OpponentStats/HealthBar" unique_id=624919172]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 22
+text = "Vida: 20/20"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EnergyBar" type="ProgressBar" parent="OpponentStats" unique_id=2107903764]
+custom_minimum_size = Vector2(300, 42)
+layout_mode = 2
+show_percentage = false
+
+[node name="ValueLabel" type="Label" parent="OpponentStats/EnergyBar" unique_id=1750376364]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 22
+text = "Energia: 10/10"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TurnLabel" type="Label" parent="." unique_id=512094871]
+offset_left = 760.0
+offset_top = 20.0
+offset_right = 1160.0
+offset_bottom = 200.0
+theme_override_font_sizes/font_size = 34
+text = "Turno: 1"
+horizontal_alignment = 1
+
+[node name="OpponentHandLabel" type="Label" parent="." unique_id=925749417]
+offset_left = 1220.0
+offset_top = 540.0
+offset_right = 1880.0
+offset_bottom = 1000.0
+theme_override_font_sizes/font_size = 20
+text = "Mao CPU:"
+horizontal_alignment = 2
+
+[node name="PlayerFxLabel" type="Label" parent="." unique_id=777001]
+visible = false
+offset_left = 240.0
+offset_top = 95.0
+offset_right = 340.0
+offset_bottom = 150.0
+theme_override_font_sizes/font_size = 40
+text = "-0"
+
+[node name="OpponentFxLabel" type="Label" parent="." unique_id=777002]
+visible = false
+offset_left = 1540.0
+offset_top = 95.0
+offset_right = 1640.0
+offset_bottom = 150.0
+theme_override_font_sizes/font_size = 40
+text = "-0"
+
+[node name="PlayerStatusLabel" type="Label" parent="." unique_id=777003]
+offset_left = 40.0
+offset_top = 230.0
+offset_right = 700.0
+offset_bottom = 500.0
+theme_override_font_sizes/font_size = 24
+
+[node name="OpponentStatusLabel" type="Label" parent="." unique_id=777004]
+offset_left = 1200.0
+offset_top = 230.0
+offset_right = 1880.0
+offset_bottom = 500.0
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 2
