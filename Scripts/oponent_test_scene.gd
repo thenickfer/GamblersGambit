@@ -20,7 +20,7 @@ func _try_start_match(cost: int, difficulty: float) -> void:
 		_refresh_ui()
 		return
 
-	GameState.set_selected_difficulty(difficulty)
+	GameState.set_selected_match(cost, difficulty)
 	get_tree().change_scene_to_file(CARD_SCENE_PATH)
 
 func _refresh_ui() -> void:
