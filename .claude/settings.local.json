@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "PowerShell(Get-ChildItem -Force \"src/global_assets/\" | Where-Object { -not $_.PSIsContainer })",
-      "PowerShell(Move-Item *)"
-    ]
-  }
-}

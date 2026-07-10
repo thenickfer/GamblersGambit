@@ -23,7 +23,7 @@ func setup(name: String) -> void:
 	card_cost = data.get("cost", 0)
 	card_effects = data.get("effects", [])
 	$Nome.text = name
-	$Custo.text = "CUSTO: " + str(card_cost)
+	$Custo.text = str(card_cost)
 	$Descricao.text = data.get("desc", "")
 	$Tipo.text = CardDB.ACTION_NAMES[card_type]
 	var art_path: String = data.get("art", CardDB.ACTION_ARTS[card_type])

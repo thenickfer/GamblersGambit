@@ -33,10 +33,6 @@ extends Node2D
 @onready var base_image: Sprite2D = $BaseImage
 @onready var art_image: Sprite2D = $ArtImage
 @onready var frame_image: Sprite2D = $FrameImage
-@onready var card_name: Label = $Nome
-@onready var card_value: Label = $Valor
-@onready var card_turns: Label = $Turnos
-@onready var card_type: Label = $Tipo
 
 
 func _ready() -> void:
@@ -60,18 +56,6 @@ func set_art_from_path(texture_path: String) -> void:
 	set_art_texture(texture)
 
 
-	
-func set_nome(name: String) -> void:
-	card_name.text = name
-	
-func set_value(val: int) -> void:
-	card_value.text = "VALOR: " + str(val)
-	
-func set_turns(val: int) -> void:
-	card_turns.text = "TURNOS: " + str(val)
-	
-func set_type(action: String) -> void:
-	card_type.text = action
 	
 func set_art_texture(texture: Texture2D) -> void:
 	art_texture = texture
