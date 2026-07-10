@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://dswm1yhdwit2m" path="res://Scripts/oponent_test_scene.gd" id="1_bunxw"]
 [ext_resource type="FontFile" uid="uid://cjf0rg7ma2ynq" path="res://Assets/fonts/SuperPixel-m2L8j.ttf" id="1_x6syj"]
 [ext_resource type="FontVariation" uid="uid://djw8ec52hrsni" path="res://Assets/fonts/Font_variation.tres" id="2_f01d1"]
+[ext_resource type="Texture2D" uid="uid://j26ljim52dto" path="res://Assets/background_menu.png" id="2_h6pmm"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_bunxw"]
 
@@ -14,6 +15,17 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_bunxw")
+
+[node name="Background" type="TextureRect" parent="." unique_id=644004874]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_h6pmm")
+expand_mode = 1
+stretch_mode = 6
 
 [node name="CoinsLabel" type="Label" parent="." unique_id=1203007001]
 layout_mode = 0
