@@ -39,6 +39,7 @@ const STATUSES = {
 	"dot":      preload("res://Scripts/statuses/status_dot.gd"),
 	"defense":  preload("res://Scripts/statuses/status_defense.gd"),
 	"reflect":  preload("res://Scripts/statuses/status_reflect.gd"),
+	"regen":    preload("res://Scripts/statuses/status_regen.gd"),
 }
 
 enum BattleState { SETUP, PLAYER_TURN, CPU_TURN, ENDED }
@@ -59,14 +60,13 @@ var _status_impl := {}
 # Energia gasta na carta que está sendo jogada (para efeitos com custo X, ex.: All In).
 var energy_spent_context: int = 0
 
-@onready var player_combatant = $PlayerStats
-@onready var cpu_combatant = $OpponentStats
+@onready var player_combatant: Combatant = $PlayerStats
+@onready var cpu_combatant: CPUCombatant = $OpponentStats
 @onready var turn_label = $TurnLabel
 @onready var card_manager = $CardManager
 @onready var player_hand = $PlayerHand
 @onready var deck_node = $Deck
 @onready var opponent_slot = $OpponentSlot
-@onready var opponent_hand_label = $OpponentHandLabel
 @onready var player_fx_label = $PlayerFxLabel
 @onready var opponent_fx_label = $OpponentFxLabel
 @onready var player_status_label = $PlayerStatusLabel
@@ -85,7 +85,6 @@ func _ready() -> void:
 	_setup_combatants()
 	battle_state = BattleState.PLAYER_TURN
 	_refresh_turn_label()
-	_refresh_opponent_hand_label()
 	_refresh_status_labels()
 
 func _setup_combatants() -> void:
@@ -93,21 +92,23 @@ func _setup_combatants() -> void:
 		"Espada", "Espada", "Escudo", "Escudo", "Poção", "Fúria", "Veneno",
 		"Bola de Fogo", "Muralha", "Bênção", "Adrenalina", "Maldição", "Bebedeira Total",
 		# cartas novas para exercitar cada mecânica do framework
-		"Cotovelada", "Sangramento Profundo", "Levantar Guarda", "Reflexo de Bar",
+		"Cotovelada", "Corte Profundo", "Levantar Guarda", "Reflexo de Bar",
 		"Carta Marcada", "Moeda da Sorte", "Veneno Fraco",
 	]
 	var cpu_cards: Array[String] = [
 		"Espada", "Escudo", "Poção", "Fúria", "Veneno", "Bola de Fogo", "Muralha",
 		"Bênção", "Adrenalina", "Maldição",
-		"Cotovelada", "Sangramento Profundo", "Levantar Guarda", "Moeda da Sorte",
+		"Cotovelada", "Corte Profundo", "Levantar Guarda", "Moeda da Sorte",
 	]
 	player_combatant.setup_deck(player_cards)
 	cpu_combatant.setup_deck(cpu_cards)
+	cpu_combatant.setup_ai(1)
 	for _i in range(MAX_HAND_SIZE):
 		deck_node.draw_card()
 		draw_cpu_card()
-
+var battle_context_for_cpu: Dictionary
 func try_play_player_card(card_node) -> Dictionary:
+	battle_context_for_cpu = _build_battle_context()
 	if battle_state != BattleState.PLAYER_TURN or battle_state == BattleState.ENDED:
 		return {"accepted": false, "went_to_board": false}
 
@@ -167,9 +168,44 @@ func _end_player_turn() -> void:
 	if not _check_battle_end():
 		_cpu_take_turn()
 
+func _get_status_snapshot(combatant) -> Array:
+	var key := str(combatant.get_instance_id())
+
+	if !statuses_by_combatant.has(key):
+		return []
+
+	return statuses_by_combatant[key].duplicate(true)
+
+func _build_battle_context() -> Dictionary:
+	return {
+		"turn_number": turn_number,
+
+		"self": {
+			"health": cpu_combatant.current_health,
+			"max_health": cpu_combatant.max_health,
+			"energy": cpu_combatant.current_energy,
+			"hand": cpu_combatant.hand.duplicate(),
+			"attack_bonus": get_attack_bonus(cpu_combatant),
+		},
+
+		"enemy": {
+			"health": player_combatant.current_health,
+			"max_health": player_combatant.max_health,
+			"energy": player_combatant.current_energy,
+			"hand_size": player_combatant.hand.size(),
+			"attack_bonus": get_attack_bonus(player_combatant),
+		},
+
+		"statuses": {
+			"self": _get_status_snapshot(cpu_combatant),
+			"enemy": _get_status_snapshot(player_combatant),
+		}
+	}
+
 func _cpu_take_turn() -> void:
 	if battle_state == BattleState.ENDED:
 		return
+	
 	_apply_turn_start(cpu_combatant)
 	if _check_battle_end():  # dano por turno (Sangramento) pode encerrar a batalha
 		return
@@ -177,14 +213,17 @@ func _cpu_take_turn() -> void:
 		draw_cpu_card()
 
 	# A CPU so pode jogar uma carta que consiga pagar com a energia atual.
-	var idx = _pick_cpu_card_index()
+
+	var decision: int = cpu_combatant.take_action(battle_context_for_cpu)
+
+	var idx = clampi(decision, -1, cpu_combatant.hand.size()-1)
+	
 	if idx == -1:
 		_end_cpu_turn()
 		return
 
 	var card_name: String = cpu_combatant.hand[idx]
 	cpu_combatant.hand.remove_at(idx)
-	_refresh_opponent_hand_label()
 	_show_cpu_card_preview(card_name)
 
 	var card_node = _build_virtual_card(card_name)
@@ -391,13 +430,6 @@ func draw_cpu_card() -> void:
 	if cpu_combatant.hand.size() >= MAX_HAND_SIZE:
 		return
 	cpu_combatant.draw_random_card()
-	_refresh_opponent_hand_label()
-
-func _refresh_opponent_hand_label() -> void:
-	var lines: Array[String] = ["Mao CPU:"]
-	for i in range(cpu_combatant.hand.size()):
-		lines.append("%d. %s" % [i + 1, cpu_combatant.hand[i]])
-	opponent_hand_label.text = "\n".join(lines)
 
 func _show_cpu_card_preview(card_name: String) -> void:
 	if opponent_slot.card_in_slot and is_instance_valid(opponent_slot.card_node):
@@ -406,6 +438,7 @@ func _show_cpu_card_preview(card_name: String) -> void:
 	var new_card = card_scene.instantiate()
 	card_manager.add_child(new_card)
 	new_card.setup(card_name)
+	new_card.scale = card_manager.HAND_CARD_SCALE  # mesmo tamanho das cartas grandes (1.5x)
 	new_card.get_node("Area2D/CollisionShape2D").disabled = true
 	new_card.global_position = opponent_slot.get_card_snap_position()
 	opponent_slot.card_in_slot = true
@@ -598,7 +631,6 @@ func discard_cards(combatant, n: int) -> void:
 			var idx = randi_range(0, combatant.hand.size() - 1)
 			combatant.add_to_discard(combatant.hand[idx])
 			combatant.hand.remove_at(idx)
-	_refresh_opponent_hand_label()
 
 func _discard_player_random() -> void:
 	var nodes = player_hand.player_hand

@@ -2,9 +2,10 @@ extends Node2D
 
 #const HAND_COUNT = 5
 
-const CARD_WIDTH = 200
-const HAND_Y_POSITION = 950
+const CARD_WIDTH = 240      # cartas mais próximas (tamanho continua 1.5x)
+const HAND_Y_POSITION = 900 # sobe a mão para a carta 1.5x não cortar embaixo
 const DEFAULT_CARD_MOVE_SPEED = 0.2
+const HAND_CARD_SCALE = Vector2(1.5, 1.5)
 
 var player_hand = []
 var center_screen_x
@@ -24,6 +25,7 @@ func update_hand_positions(speed):
 	for i in range(player_hand.size()):
 		var new_position = Vector2(calculate_card_position(i), HAND_Y_POSITION)
 		var card = player_hand[i]
+		card.scale = HAND_CARD_SCALE
 		card.starting_position = new_position
 		animate_card_to_position (card, new_position, speed)
 		

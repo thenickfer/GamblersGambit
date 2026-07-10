@@ -4,6 +4,12 @@ const COLLISION_MASK_CARD = 1
 const COLLISION_MASK_CARD_SLOT = 2
 const DEFAULT_CARD_MOVE_SPEED = 0.2
 
+# Escala das cartas enquanto estão na mão (1.5x). Hover fica um pouco maior.
+# Cartas jogadas no tabuleiro voltam ao tamanho normal (cabem nos slots).
+const HAND_CARD_SCALE = Vector2(1.5, 1.5)
+const HAND_HOVER_SCALE = Vector2(1.6, 1.6)
+const PLAYED_CARD_SCALE = Vector2(1.05, 1.05)
+
 var card_being_dragged
 var screen_size
 var is_hovering_on_card
@@ -25,11 +31,11 @@ func _process(delta: float) -> void:
 		card_being_dragged.position = card_being_dragged.position.lerp(screen_mouse_pos, 8.0 * delta)
 
 func start_drag(card):
-	card.scale = Vector2(1, 1)
+	card.scale = HAND_CARD_SCALE
 	card_being_dragged = card
 
 func finish_drag():
-	card_being_dragged.scale = Vector2(1.05, 1.05)
+	card_being_dragged.scale = PLAYED_CARD_SCALE
 	var card_slot_found = raycast_check_for_card_slot()
 	if card_slot_found and card_slot_found.is_player_slot:
 		var result = game_manager_reference.try_play_player_card(card_being_dragged)
@@ -44,8 +50,10 @@ func finish_drag():
 				card_slot_found.card_node = card_being_dragged
 			deck_reference.draw_card()
 		else:
+			card_being_dragged.scale = HAND_CARD_SCALE
 			player_hand_reference.add_card_to_hand(card_being_dragged, DEFAULT_CARD_MOVE_SPEED)
 	else:
+		card_being_dragged.scale = HAND_CARD_SCALE
 		player_hand_reference.add_card_to_hand(card_being_dragged, DEFAULT_CARD_MOVE_SPEED)
 	card_being_dragged = null
 
@@ -72,10 +80,10 @@ func highlight_card(card, hovered):
 	if card.get_meta("on_temp_board", false):
 		return
 	if hovered:
-		card.scale = Vector2(1.05, 1.05)
+		card.scale = HAND_HOVER_SCALE
 		card.z_index = 2
 	else:
-		card.scale = Vector2(1, 1)
+		card.scale = HAND_CARD_SCALE
 		card.z_index = 1
 
 func on_left_click_released():

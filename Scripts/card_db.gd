@@ -43,7 +43,8 @@ const ACTION_ARTS = {
 #   {"kind": "block",  "value": N}                     -> concede N de bloqueio (+buffs de defesa)
 #   {"kind": "apply_status", "target": "self"/"enemy", "status": { ... }}
 #        -> aplica um status contínuo (ver Scripts/statuses/). O dicionário "status" tem:
-#           kind: "attack"|"incoming"|"dot"|"defense"|"reflect"; value; mult; blocks_heal;
+#           kind: "attack"|"incoming"|"dot"|"regen"|"defense"|"reflect"; value; mult; blocks_heal;
+#           ("dot" = dano por turno; "regen" = energia por turno)
 #           e duração por turns (>0, charges 0) OU por charges (>0 = consumido no uso).
 #   {"kind": "remove_status", "id": "Veneno", "amount": -1, "target": "enemy"}
 #        -> amount<0 remove; amount>=0 reduz o value do status com esse id
@@ -141,6 +142,7 @@ const CARDS = {
 	},
 	"Bebedeira Total": {
 		"type": Action.BUFF, "rarity": "Chaos", "cost": 2,
+		"art": "res://Assets/Cards/Arts/total_bender.png",
 		"desc": "As próximas 2 cartas custam 1 a menos (mín. 0). No próximo turno você começa com -1 de energia.",
 		"effects": [
 			{"kind": "cost_mod", "amount": 1, "charges": 2, "target": "self"},
@@ -150,13 +152,15 @@ const CARDS = {
 	# --- Cartas novas: uma por mecânica do framework ---
 	"Cotovelada": {
 		"type": Action.ATTACK, "rarity": "Comum", "cost": 1,
+		"art": "res://Assets/Cards/Arts/elbow_strike.png",
 		"desc": "Causa 2 de dano e ignora defesa.",
 		"effects": [
 			{"kind": "damage", "value": 2, "ignore_block": true},
 		],
 	},
-	"Sangramento Profundo": {
+	"Corte Profundo": {
 		"type": Action.ATTACK, "rarity": "Rara", "cost": 2,
+		"art": "res://Assets/Cards/Arts/deep_bleed.png",
 		"desc": "Causa 4 de dano e aplica Sangramento (2) por 3 turnos.",
 		"effects": [
 			{"kind": "damage", "value": 4},
@@ -165,6 +169,7 @@ const CARDS = {
 	},
 	"Levantar Guarda": {
 		"type": Action.DEFENCE, "rarity": "Comum", "cost": 1,
+		"art": "res://Assets/Cards/Arts/raise_guard.png",
 		"desc": "Bloqueia 4 de dano.",
 		"effects": [
 			{"kind": "block", "value": 4},
@@ -172,6 +177,7 @@ const CARDS = {
 	},
 	"Reflexo de Bar": {
 		"type": Action.DEFENCE, "rarity": "Comum", "cost": 2,
+		"art": "res://Assets/Cards/Arts/bar_reflex.png",
 		"desc": "Bloqueia 4 de dano e devolve 2 ao atacante.",
 		"effects": [
 			{"kind": "block", "value": 4},
@@ -180,6 +186,7 @@ const CARDS = {
 	},
 	"Carta Marcada": {
 		"type": Action.BUFF, "rarity": "Comum", "cost": 1,
+		"art": "res://Assets/Cards/Arts/marked_card.png",
 		"desc": "Seu próximo ataque causa +2 de dano.",
 		"effects": [
 			{"kind": "apply_status", "target": "self", "status": {"kind": "attack", "id": "Carta Marcada", "value": 2, "charges": 1}},
@@ -187,6 +194,7 @@ const CARDS = {
 	},
 	"Moeda da Sorte": {
 		"type": Action.ATTACK, "rarity": "Chaos", "cost": 1,
+		"art": "res://Assets/Cards/Arts/lucky_coin.png",
 		"desc": "50% de chance de causar 10 de dano. 50% de causar 6 em você.",
 		"effects": [
 			{"kind": "chance", "outcomes": [
@@ -197,9 +205,111 @@ const CARDS = {
 	},
 	"Veneno Fraco": {
 		"type": Action.DEBUFF, "rarity": "Comum", "cost": 2,
+		"art": "res://Assets/Cards/Arts/weak_poison.png",
 		"desc": "Aplica Veneno (2) por 2 turnos.",
 		"effects": [
 			{"kind": "apply_status", "target": "enemy", "status": {"kind": "dot", "id": "Veneno", "value": 2, "turns": 2}},
+		],
+	},
+	# --- Cartas de energia pura ---
+	"Gole Rápido": {
+		"type": Action.ENERGY, "rarity": "Comum", "cost": 0,
+		"art": "res://Assets/Cards/Arts/quick_sip.png",
+		"desc": "Ganha 1 de energia.",
+		"effects": [
+			{"kind": "energy", "value": 1, "target": "self"},
+		],
+	},
+	"Caneca Cheia": {
+		"type": Action.ENERGY, "rarity": "Comum", "cost": 1,
+		"art": "res://Assets/Cards/Arts/full_mug.png",
+		"desc": "Ganha 3 de energia (líquido +2).",
+		"effects": [
+			{"kind": "energy", "value": 3, "target": "self"},
+		],
+	},
+	"Roubo de Fichas": {
+		"type": Action.ENERGY, "rarity": "Rara", "cost": 1,
+		"art": "res://Assets/Cards/Arts/chip_steal.png",
+		"desc": "Rouba 2 de energia do inimigo.",
+		"effects": [
+			{"kind": "energy", "value": -2, "target": "enemy"},
+			{"kind": "energy", "value": 2, "target": "self"},
+		],
+	},
+	# --- Cartas de ataque adicionais ---
+	"Soco Bêbado": {
+		"type": Action.ATTACK, "rarity": "Comum", "cost": 0,
+		"art": "res://Assets/Cards/Arts/drunken_punch.png",
+		"desc": "Causa 3 de dano.",
+		"effects": [
+			{"kind": "damage", "value": 3},
+		],
+	},
+	"Caneca na Cabeça": {
+		"type": Action.ATTACK, "rarity": "Comum", "cost": 1,
+		"art": "res://Assets/Cards/Arts/mug_smash.png",
+		"desc": "Causa 5 de dano.",
+		"effects": [
+			{"kind": "damage", "value": 5},
+		],
+	},
+	"Garrafada": {
+		"type": Action.ATTACK, "rarity": "Comum", "cost": 2,
+		"art": "res://Assets/Cards/Arts/bottle_smash.png",
+		"desc": "Causa 7 de dano.",
+		"effects": [
+			{"kind": "damage", "value": 7},
+		],
+	},
+	"Facada Dupla": {
+		"type": Action.ATTACK, "rarity": "Rara", "cost": 2,
+		"art": "res://Assets/Cards/Arts/double_stab.png",
+		"desc": "Causa 4 de dano duas vezes.",
+		"effects": [
+			{"kind": "damage", "value": 4},
+			{"kind": "damage", "value": 4},
+		],
+	},
+	"Última Aposta": {
+		"type": Action.ATTACK, "rarity": "Chaos", "cost": "X",
+		"art": "res://Assets/Cards/Arts/last_bet.png",
+		"desc": "Gasta toda a energia e causa 3 de dano por energia gasta.",
+		"effects": [
+			{"kind": "damage", "per_spent": 3},
+		],
+	},
+	# --- Energia por turno (duração crescente) ---
+	"Fôlego": {
+		"type": Action.ENERGY, "rarity": "Comum", "cost": 1,
+		"art": "res://Assets/Cards/Arts/breath.png",
+		"desc": "Ganha 1 de energia no início dos seus próximos 2 turnos.",
+		"effects": [
+			{"kind": "apply_status", "target": "self", "status": {"kind": "regen", "id": "Fôlego", "value": 1, "turns": 2}},
+		],
+	},
+	"Segundo Fôlego": {
+		"type": Action.ENERGY, "rarity": "Comum", "cost": 1,
+		"art": "res://Assets/Cards/Arts/second_wind.png",
+		"desc": "Ganha 1 de energia no início dos seus próximos 3 turnos.",
+		"effects": [
+			{"kind": "apply_status", "target": "self", "status": {"kind": "regen", "id": "Segundo Fôlego", "value": 1, "turns": 3}},
+		],
+	},
+	"Vigor do Tavernista": {
+		"type": Action.ENERGY, "rarity": "Rara", "cost": 2,
+		"art": "res://Assets/Cards/Arts/tavernkeeper_vigor.png",
+		"desc": "Ganha 1 de energia no início dos seus próximos 4 turnos.",
+		"effects": [
+			{"kind": "apply_status", "target": "self", "status": {"kind": "regen", "id": "Vigor do Tavernista", "value": 1, "turns": 4}},
+		],
+	},
+	"Maré de Energia": {
+		"type": Action.ENERGY, "rarity": "Lendária", "cost": 3,
+		"art": "res://Assets/Cards/Arts/energy_tide.png",
+		"desc": "Ganha 2 de energia no início dos seus próximos 5 turnos.",
+		"effects": [
+			{"kind": "apply_status", "target": "self", "status": {"kind": "regen", "id": "Maré de Energia", "value": 2, "turns": 5}},
 		],
 	},
 }
