@@ -62,10 +62,10 @@ position = Vector2(129, 901)
 script = ExtResource("4_qnx4h")
 
 [node name="Shadow" type="Sprite2D" parent="Deck" unique_id=609141696]
+modulate = Color(0, 0, 0, 0.35)
 z_index = -2
 position = Vector2(4, 6)
 scale = Vector2(0.137, 0.137)
-modulate = Color(0, 0, 0, 0.35)
 texture = ExtResource("13_back")
 
 [node name="Sprite2D" type="Sprite2D" parent="Deck" unique_id=609141695]

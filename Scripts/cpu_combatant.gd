@@ -2,7 +2,11 @@ class_name CPUCombatant extends Combatant
 
 const CardDB = preload("res://Scripts/card_db.gd")
 
+
 var ai_controller: AIController
+
+func _init() -> void:
+	combatant_name = "Inimigo"
 
 func setup_ai(difficulty: float) -> void:
 	ai_controller = AIController.new(difficulty)
