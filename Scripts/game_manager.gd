@@ -80,6 +80,8 @@ func _ready() -> void:
 	cpu_combatant.died.connect(_on_combatant_died)
 	battle_ended.connect(_on_battle_ended)
 
+	cpu_combatant.cpu_pick_assertiveness = GameState.selected_cpu_assertiveness
+
 	_setup_combatants()
 	battle_state = BattleState.PLAYER_TURN
 	_refresh_turn_label()
