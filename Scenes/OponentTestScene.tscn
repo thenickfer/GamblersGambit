@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dswm1yhdwit2m" path="res://Scripts/oponent_test_scene.gd" id="1_bunxw"]
 [ext_resource type="FontFile" uid="uid://cjf0rg7ma2ynq" path="res://Assets/fonts/SuperPixel-m2L8j.ttf" id="1_x6syj"]
-[ext_resource type="FontFile" uid="uid://sn8e2l4o47iw" path="res://Assets/fonts/Snowbell-Wp4g9.ttf" id="3_f01d1"]
+[ext_resource type="FontVariation" uid="uid://djw8ec52hrsni" path="res://Assets/fonts/Font_variation.tres" id="2_f01d1"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_bunxw"]
 
@@ -24,7 +24,7 @@ offset_bottom = 128.0
 theme_override_colors/font_color = Color(1, 0.95, 0.82, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 6
-theme_override_fonts/font = ExtResource("3_f01d1")
+theme_override_fonts/font = ExtResource("2_f01d1")
 theme_override_font_sizes/font_size = 42
 text = "Moedas: 100"
 horizontal_alignment = 1
@@ -103,7 +103,7 @@ offset_top = 620.0
 offset_right = 502.0
 offset_bottom = 772.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_fonts/font = ExtResource("3_f01d1")
+theme_override_fonts/font = ExtResource("2_f01d1")
 theme_override_font_sizes/font_size = 44
 text = "Custo: 20"
 
@@ -114,7 +114,7 @@ offset_top = 620.0
 offset_right = 1112.0
 offset_bottom = 772.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_fonts/font = ExtResource("3_f01d1")
+theme_override_fonts/font = ExtResource("2_f01d1")
 theme_override_font_sizes/font_size = 44
 text = "Custo: 50"
 
@@ -125,6 +125,6 @@ offset_top = 620.0
 offset_right = 1741.0
 offset_bottom = 772.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_fonts/font = ExtResource("3_f01d1")
+theme_override_fonts/font = ExtResource("2_f01d1")
 theme_override_font_sizes/font_size = 44
 text = "Custo: 90"

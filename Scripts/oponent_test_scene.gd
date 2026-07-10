@@ -10,8 +10,8 @@ const CARD_SCENE_PATH = "res://Scenes/CardScene.tscn"
 
 func _ready() -> void:
 	op1_button.pressed.connect(func() -> void: _try_start_match(20, 0.2))
-	op2_button.pressed.connect(func() -> void: _try_start_match(30, 0.5))
-	op3_button.pressed.connect(func() -> void: _try_start_match(50, 0.9))
+	op2_button.pressed.connect(func() -> void: _try_start_match(50, 0.5))
+	op3_button.pressed.connect(func() -> void: _try_start_match(90, 0.9))
 	_refresh_ui()
 
 func _try_start_match(cost: int, difficulty: float) -> void:
