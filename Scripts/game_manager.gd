@@ -71,6 +71,7 @@ var energy_spent_context: int = 0
 @onready var opponent_fx_label = $OpponentFxLabel
 @onready var player_status_label = $PlayerStatusLabel
 @onready var opponent_status_label = $OpponentStatusLabel
+@onready var skip_turn_button: Button = $SkipTurnButton
 
 func _ready() -> void:
 	for k in STATUSES:
@@ -79,6 +80,7 @@ func _ready() -> void:
 	player_combatant.died.connect(_on_combatant_died)
 	cpu_combatant.died.connect(_on_combatant_died)
 	battle_ended.connect(_on_battle_ended)
+	skip_turn_button.pressed.connect(_on_skip_turn_pressed)
 
 	cpu_combatant.cpu_pick_assertiveness = GameState.selected_cpu_assertiveness
 
@@ -86,6 +88,7 @@ func _ready() -> void:
 	battle_state = BattleState.PLAYER_TURN
 	_refresh_turn_label()
 	_refresh_status_labels()
+	_refresh_skip_turn_button()
 
 func _setup_combatants() -> void:
 	var player_cards: Array[String] = [
@@ -108,7 +111,7 @@ func _setup_combatants() -> void:
 		draw_cpu_card()
 var battle_context_for_cpu: Dictionary
 func try_play_player_card(card_node) -> Dictionary:
-	battle_context_for_cpu = _build_battle_context()
+	#battle_context_for_cpu = _build_battle_context()
 	if battle_state != BattleState.PLAYER_TURN or battle_state == BattleState.ENDED:
 		return {"accepted": false, "went_to_board": false}
 
@@ -165,8 +168,14 @@ func _end_player_turn() -> void:
 	battle_state = BattleState.CPU_TURN
 	_refresh_status_labels()
 	_refresh_turn_label()
+	_refresh_skip_turn_button()
 	if not _check_battle_end():
 		_cpu_take_turn()
+
+func _on_skip_turn_pressed() -> void:
+	if battle_state != BattleState.PLAYER_TURN or battle_state == BattleState.ENDED:
+		return
+	_end_player_turn()
 
 func _get_status_snapshot(combatant) -> Array:
 	var key := str(combatant.get_instance_id())
@@ -214,6 +223,7 @@ func _cpu_take_turn() -> void:
 
 	# A CPU so pode jogar uma carta que consiga pagar com a energia atual.
 
+	battle_context_for_cpu = _build_battle_context()
 	var decision: int = cpu_combatant.take_action(battle_context_for_cpu)
 
 	var idx = clampi(decision, -1, cpu_combatant.hand.size()-1)
@@ -246,6 +256,7 @@ func _end_cpu_turn() -> void:
 	_apply_turn_start(player_combatant)  # início do próximo turno do jogador
 	_check_battle_end()  # dano por turno pode matar o jogador no começo do turno
 	_refresh_turn_label()
+	_refresh_skip_turn_button()
 
 func _build_virtual_card(card_name: String) -> Dictionary:
 	var data: Dictionary = CardDB.CARDS[card_name]
@@ -640,6 +651,7 @@ func _check_battle_end() -> bool:
 func _end_battle(winner, loser) -> void:
 	battle_state = BattleState.ENDED
 	turn_label.text = "Batalha Encerrada\nVencedor: %s" % winner.combatant_name
+	_refresh_skip_turn_button()
 	emit_signal("battle_ended", winner, loser)
 
 # Tela de fim de jogo: vitoria/derrota + botao de voltar ao menu (estilo dos menus).
@@ -709,3 +721,6 @@ func _refresh_turn_label() -> void:
 	if enemy_attack != 0:
 		txt += "\nAtaque inimigo: %+d" % enemy_attack
 	turn_label.text = txt
+
+func _refresh_skip_turn_button() -> void:
+	skip_turn_button.disabled = battle_state != BattleState.PLAYER_TURN

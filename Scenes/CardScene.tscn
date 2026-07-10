@@ -21,6 +21,48 @@ size = Vector2(150, 200)
 fallbacks = Array[Font]([ExtResource("12_snow")])
 base_font = ExtResource("11_font")
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_skip_normal"]
+bg_color = Color(0.18, 0.09, 0.035, 0.94)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.72, 0.42, 0.14, 1)
+shadow_color = Color(0, 0, 0, 0.45)
+shadow_size = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_skip_pressed"]
+bg_color = Color(0.11, 0.055, 0.025, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(1, 0.62, 0.2, 1)
+shadow_color = Color(0, 0, 0, 0.35)
+shadow_size = 2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_skip_hover"]
+bg_color = Color(0.26, 0.13, 0.045, 0.96)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(1, 0.78, 0.36, 1)
+shadow_color = Color(0, 0, 0, 0.45)
+shadow_size = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_skip_disabled"]
+bg_color = Color(0.08, 0.055, 0.045, 0.72)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.28, 0.2, 0.16, 1)
+shadow_color = Color(0, 0, 0, 0.3)
+shadow_size = 3
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_skip_focus"]
+
 [node name="Main" type="Node2D" unique_id=435446635]
 script = ExtResource("9_gm")
 metadata/_edit_horizontal_guides_ = [268.0, 752.0]
@@ -205,6 +247,27 @@ theme_override_fonts/font = SubResource("FontVariation_main")
 theme_override_font_sizes/font_size = 34
 text = "Turno: 1"
 horizontal_alignment = 1
+
+[node name="SkipTurnButton" type="Button" parent="." unique_id=684481884]
+offset_left = 815.0
+offset_top = 205.0
+offset_right = 1105.0
+offset_bottom = 263.0
+theme_override_colors/font_color = Color(1, 0.95, 0.82, 1)
+theme_override_colors/font_focus_color = Color(1, 0.78, 0.36, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.78, 0.36, 1)
+theme_override_colors/font_hover_color = Color(1, 0.78, 0.36, 1)
+theme_override_colors/font_disabled_color = Color(0.55, 0.5, 0.44, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_fonts/font = SubResource("FontVariation_main")
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_skip_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_skip_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_skip_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_skip_disabled")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_skip_focus")
+text = "PULAR VEZ"
 
 [node name="PlayerFxLabel" type="Label" parent="." unique_id=777001]
 visible = false
