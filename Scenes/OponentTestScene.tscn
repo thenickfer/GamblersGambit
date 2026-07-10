@@ -41,7 +41,7 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 6
 theme_override_fonts/font = ExtResource("2_f01d1")
 theme_override_font_sizes/font_size = 42
-text = "Moedas: 100"
+text = "Moedas: 20"
 horizontal_alignment = 1
 
 [node name="MessageLabel" type="Label" parent="." unique_id=1203007002]
@@ -131,7 +131,7 @@ offset_bottom = 772.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("2_f01d1")
 theme_override_font_sizes/font_size = 44
-text = "Custo: 50"
+text = "Custo: 40"
 
 [node name="Op3Label" type="Label" parent="." unique_id=1035985133]
 layout_mode = 0
@@ -142,7 +142,7 @@ offset_bottom = 772.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("2_f01d1")
 theme_override_font_sizes/font_size = 44
-text = "Custo: 90"
+text = "Custo: 80"
 
 [node name="Character3" type="TextureRect" parent="." unique_id=171388938]
 layout_mode = 0

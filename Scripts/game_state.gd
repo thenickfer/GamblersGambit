@@ -1,6 +1,6 @@
 extends Node
 
-const STARTING_COINS: int = 100
+const STARTING_COINS: int = 20
 
 var player_coins: int = STARTING_COINS
 var selected_cpu_assertiveness: float = 0.2
