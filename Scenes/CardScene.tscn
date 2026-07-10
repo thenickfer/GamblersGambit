@@ -127,6 +127,7 @@ offset_right = 1881.0
 offset_bottom = 169.0
 theme_override_constants/separation = 10
 script = ExtResource("8_cmbt")
+cpu_pick_assertiveness = 0.75
 
 [node name="NameLabel" type="Label" parent="OpponentStats" unique_id=295554465]
 layout_mode = 2

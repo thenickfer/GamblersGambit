@@ -7,6 +7,7 @@ signal died(combatant)
 @export var start_health: int = -1
 @export var max_energy: int = 10
 @export var start_energy: int = -1
+@export_range(0.0, 1.0, 0.05) var cpu_pick_assertiveness: float = 0.65
 
 var current_health: int
 var current_energy: int
