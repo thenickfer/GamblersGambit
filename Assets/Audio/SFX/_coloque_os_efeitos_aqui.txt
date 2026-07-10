@@ -1,0 +1,3 @@
+Coloque aqui os .ogg de efeitos sonoros (card_draw, card_place, hit, heal, block,
+button_click, victory, defeat, error, card_attack/defence/cure/buff/debuff/energy, ...).
+Veja ../README.md para a lista completa e onde baixar de graça.

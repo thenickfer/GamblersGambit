@@ -30,6 +30,9 @@ const ACTION_ARTS = {
 #   rarity  -> "Comum" | "Rara" | "Lendária" | "Chaos" (cosmético por enquanto)
 #   cost    -> energia gasta ao jogar a carta
 #   art     -> caminho da arte (opcional; usa ACTION_ARTS[type] se ausente)
+#   sfx     -> chave do efeito sonoro ao jogar (opcional; usa o som da categoria,
+#              SFX_BY_TYPE em game_manager.gd, se ausente). A chave precisa existir
+#              em SFX_PATHS (Scripts/audio_manager.gd). Use para cartas "diferentonas".
 #   desc    -> texto descritivo (opcional)
 #   effects -> lista de efeitos aplicados EM ORDEM ao jogar a carta.
 #              Cada efeito é um Dictionary com a chave "kind" e parâmetros.
@@ -103,6 +106,7 @@ const CARDS = {
 	"Bola de Fogo": {
 		"type": Action.ATTACK, "rarity": "Rara", "cost": 3,
 		"art": "res://Assets/Cards/Arts/fireball.png",
+		"sfx": "card_fireball",
 		"desc": "Causa 9 de dano.",
 		"effects": [
 			{"kind": "damage", "value": 9},
@@ -143,6 +147,7 @@ const CARDS = {
 	"Bebedeira Total": {
 		"type": Action.BUFF, "rarity": "Chaos", "cost": 2,
 		"art": "res://Assets/Cards/Arts/total_bender.png",
+		"sfx": "card_bender",
 		"desc": "As próximas 2 cartas custam 1 a menos (mín. 0). No próximo turno você começa com -1 de energia.",
 		"effects": [
 			{"kind": "cost_mod", "amount": 1, "charges": 2, "target": "self"},

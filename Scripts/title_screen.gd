@@ -12,6 +12,8 @@ var _transitioning: bool = false
 
 
 func _ready() -> void:
+	AudioManager.play_music("menu")
+
 	fade_overlay.color = Color(0, 0, 0, 1)
 	prompt.modulate.a = 0.0
 
@@ -40,6 +42,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _start_transition() -> void:
 	_transitioning = true
+	AudioManager.play_sfx("button_click")
 	var tween := create_tween()
 	tween.tween_property(fade_overlay, "color:a", 1.0, transition_duration)
 	tween.tween_callback(func() -> void: get_tree().change_scene_to_file(next_scene))

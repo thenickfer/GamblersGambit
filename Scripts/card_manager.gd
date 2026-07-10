@@ -50,6 +50,7 @@ func finish_drag():
 				card_slot_found.card_node = card_being_dragged
 			deck_reference.draw_card()
 		else:
+			AudioManager.play_sfx("error")  # jogada recusada (ex.: energia insuficiente)
 			card_being_dragged.scale = HAND_CARD_SCALE
 			player_hand_reference.add_card_to_hand(card_being_dragged, DEFAULT_CARD_MOVE_SPEED)
 	else:

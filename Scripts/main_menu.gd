@@ -8,6 +8,8 @@ extends Control
 
 
 func _ready() -> void:
+	AudioManager.play_music("menu")  # mesma faixa do título -> continua sem cortar
+
 	fade_overlay.color = Color(0, 0, 0, 1)
 	var tween := create_tween()
 	tween.tween_property(fade_overlay, "color:a", 0.0, fade_duration)
@@ -19,6 +21,7 @@ func _ready() -> void:
 
 
 func _on_play_pressed() -> void:
+	AudioManager.play_sfx("button_click")
 	play_button.disabled = true
 	var tween := create_tween()
 	tween.tween_property(fade_overlay, "color:a", 1.0, fade_duration)
@@ -28,4 +31,5 @@ func _on_play_pressed() -> void:
 
 
 func _on_quit_pressed() -> void:
+	AudioManager.play_sfx("button_click")
 	get_tree().quit()

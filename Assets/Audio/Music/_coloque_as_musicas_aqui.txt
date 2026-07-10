@@ -1,0 +1,2 @@
+Coloque aqui: menu_theme.ogg e combat_theme.ogg (deixe "Loop" ligado no Import).
+Veja ../README.md para a lista completa e onde baixar de graça.
