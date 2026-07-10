@@ -1,0 +1,18 @@
+extends Node
+
+const STARTING_COINS: int = 100
+
+var player_coins: int = STARTING_COINS
+var selected_cpu_assertiveness: float = 0.2
+
+func can_afford_coins(amount: int) -> bool:
+	return player_coins >= amount
+
+func spend_coins(amount: int) -> bool:
+	if not can_afford_coins(amount):
+		return false
+	player_coins -= amount
+	return true
+
+func set_selected_difficulty(assertiveness: float) -> void:
+	selected_cpu_assertiveness = clampf(assertiveness, 0.0, 1.0)

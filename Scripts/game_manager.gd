@@ -80,6 +80,8 @@ func _ready() -> void:
 	cpu_combatant.died.connect(_on_combatant_died)
 	battle_ended.connect(_on_battle_ended)
 
+	cpu_combatant.cpu_pick_assertiveness = GameState.selected_cpu_assertiveness
+
 	_setup_combatants()
 	battle_state = BattleState.PLAYER_TURN
 	_refresh_turn_label()
@@ -237,16 +239,161 @@ func _cpu_take_turn() -> void:
 		return
 	_end_cpu_turn()
 
-# Retorna o indice de uma carta aleatoria que a CPU consegue pagar, ou -1.
+# Retorna o indice de uma carta que a CPU consegue pagar, ou -1.
+# cpu_pick_assertiveness controla a chance de escolher a melhor carta estimada:
+# 0.0 = aleatorio entre jogaveis; 1.0 = sempre a maior pontuacao.
 func _pick_cpu_card_index() -> int:
-	var affordable: Array[int] = []
+	var affordable: Array[Dictionary] = []
 	for i in range(cpu_combatant.hand.size()):
-		var base_cost = CardDB.CARDS[cpu_combatant.hand[i]].get("cost", 0)
+		var card_name: String = cpu_combatant.hand[i]
+		var base_cost = CardDB.CARDS[card_name].get("cost", 0)
 		if cpu_combatant.can_afford(_resolve_cost(cpu_combatant, base_cost)):
-			affordable.append(i)
+			affordable.append({"index": i, "score": _score_cpu_card(card_name)})
 	if affordable.is_empty():
 		return -1
-	return affordable[randi_range(0, affordable.size() - 1)]
+
+	var assertiveness := clampf(float(cpu_combatant.cpu_pick_assertiveness), 0.0, 1.0)
+	if randf() > assertiveness:
+		return int(affordable[randi_range(0, affordable.size() - 1)]["index"])
+
+	var best := affordable[0]
+	for option in affordable:
+		if float(option["score"]) > float(best["score"]):
+			best = option
+	return int(best["index"])
+
+func _score_cpu_card(card_name: String) -> float:
+	var data: Dictionary = CardDB.CARDS[card_name]
+	var cost = _resolve_cost(cpu_combatant, data.get("cost", 0))
+	var score := -float(cost) * 0.25
+	for effect_data in data.get("effects", []):
+		score += _score_cpu_effect(effect_data, cost, 1.0)
+	return score
+
+func _score_cpu_effect(effect_data: Dictionary, card_cost: int, weight: float) -> float:
+	var kind := String(effect_data.get("kind", ""))
+	var score := 0.0
+	match kind:
+		"damage":
+			var damage := int(effect_data.get("value", 0))
+			if effect_data.has("per_spent"):
+				damage = card_cost * int(effect_data.get("per_spent", 1))
+			score += _score_cpu_damage(_cpu_effect_target(effect_data, "enemy"), damage, bool(effect_data.get("ignore_block", false)))
+		"heal":
+			score += _score_cpu_heal(_cpu_effect_target(effect_data, "self"), int(effect_data.get("value", 0)))
+		"energy":
+			score += _score_cpu_energy(_cpu_effect_target(effect_data, "self"), int(effect_data.get("value", 0)))
+		"block":
+			score += _score_cpu_block(_cpu_effect_target(effect_data, "self"), int(effect_data.get("value", 0)))
+		"apply_status":
+			score += _score_cpu_status(_cpu_effect_target(effect_data, "self"), effect_data.get("status", {}))
+		"remove_status":
+			var remove_target = _cpu_effect_target(effect_data, "enemy")
+			score += 2.0 if remove_target == player_combatant else -2.0
+		"reflect":
+			score += _score_cpu_block(cpu_combatant, int(effect_data.get("value", 0))) * 0.6
+		"chance":
+			score += _score_cpu_chance(effect_data, card_cost)
+		"conditional":
+			score += _score_cpu_conditional(effect_data, card_cost)
+		"draw":
+			var draw_target = _cpu_effect_target(effect_data, "self")
+			score += float(int(effect_data.get("value", 0))) * (1.2 if draw_target == cpu_combatant else -1.2)
+		"discard":
+			var discard_target = _cpu_effect_target(effect_data, "enemy")
+			score += float(int(effect_data.get("value", 0))) * (2.0 if discard_target == player_combatant else -2.0)
+		"cost_mod":
+			score += float(int(effect_data.get("amount", 1)) * int(effect_data.get("charges", 1))) * 1.2
+		"defer":
+			score += _score_cpu_effect(effect_data.get("effect", {}), card_cost, 1.0) * 0.6
+	return score * weight
+
+func _score_cpu_damage(target, amount: int, ignore_block: bool) -> float:
+	var damage := amount
+	if target == player_combatant and not ignore_block:
+		damage = max(0, damage - int(player_combatant.get("block")))
+	if target == cpu_combatant:
+		return -float(damage) * 2.5
+
+	var score := float(damage) * 2.5
+	if damage >= player_combatant.current_health:
+		score += 100.0
+	var player_health_ratio :float = float(player_combatant.current_health) / max(1.0, float(player_combatant.max_health))
+	if player_health_ratio <= 0.35:
+		score += float(damage) * 1.5
+	return score
+
+func _score_cpu_heal(target, amount: int) -> float:
+	var missing = max(0, target.max_health - target.current_health)
+	var useful_heal = min(amount, missing)
+	var score := float(useful_heal) * 2.2
+	var health_ratio :float = float(target.current_health) / max(1.0, float(target.max_health))
+	if health_ratio <= 0.35:
+		score *= 1.8
+	return score if target == cpu_combatant else -score
+
+func _score_cpu_energy(target, amount: int) -> float:
+	if target == cpu_combatant:
+		return float(amount) * 0.8
+	return -float(amount) * 0.8
+
+func _score_cpu_block(target, amount: int) -> float:
+	var score := float(amount) * 1.1
+	var cpu_health_ratio : float = float(cpu_combatant.current_health) / max(1.0, float(cpu_combatant.max_health))
+	if cpu_health_ratio <= 0.4:
+		score *= 1.7
+	return score if target == cpu_combatant else -score
+
+func _score_cpu_status(target, status_data) -> float:
+	var status: Dictionary = (status_data as Dictionary)
+	var kind := String(status.get("kind", ""))
+	var value := int(status.get("value", 0))
+	var duration :int = max(1, int(status.get("turns", status.get("charges", 1))))
+	var score := 0.0
+	match kind:
+		"attack":
+			score = float(value * duration) * 1.6
+			score = score if target == cpu_combatant else -score
+		"dot":
+			score = float(value * duration) * 2.0
+			score = score if target == player_combatant else -score
+		"defense":
+			score = float(value * duration) * 1.1
+			score = score if target == cpu_combatant else -score
+		"incoming":
+			score = float(value * duration) * 1.4
+			score = score if target == player_combatant else -score
+		"reflect":
+			score = float(value * duration) * 1.2
+			score = score if target == cpu_combatant else -score
+	if bool(status.get("blocks_heal", false)):
+		score += 4.0 if target == player_combatant else -4.0
+	return score
+
+func _score_cpu_chance(effect_data: Dictionary, card_cost: int) -> float:
+	var outcomes: Array = effect_data.get("outcomes", [])
+	var total_weight := 0
+	var total_score := 0.0
+	for outcome in outcomes:
+		var outcome_weight := int(outcome.get("weight", 1))
+		total_weight += outcome_weight
+		for nested_effect in outcome.get("effects", []):
+			total_score += _score_cpu_effect(nested_effect, card_cost, float(outcome_weight))
+	if total_weight <= 0:
+		return 0.0
+	return total_score / float(total_weight)
+
+func _score_cpu_conditional(effect_data: Dictionary, card_cost: int) -> float:
+	var context := {"source": cpu_combatant, "target": player_combatant}
+	var branch: Array = effect_data.get("then", []) if check_condition(context, effect_data.get("condition", {})) else effect_data.get("else", [])
+	var score := 0.0
+	for nested_effect in branch:
+		score += _score_cpu_effect(nested_effect, card_cost, 1.0)
+	return score
+
+func _cpu_effect_target(effect_data: Dictionary, default_target: String):
+	var target_spec := String(effect_data.get("target", default_target))
+	return cpu_combatant if target_spec == "self" else player_combatant
 
 func _end_cpu_turn() -> void:
 	turn_number += 1

@@ -7,15 +7,16 @@ signal died(combatant)
 @export var start_health: int = -1
 @export var max_energy: int = 10
 @export var start_energy: int = -1
+@export_range(0.0, 1.0, 0.05) var cpu_pick_assertiveness: float = 0.65
 
 var current_health: int
 var current_energy: int
-var block: int = 0  # bloqueio que absorve dano; zerado no início do turno do dono
 var hand: Array = []
 var deck: Array[String] = []
 var initial_deck: Array[String] = []  # copia das cartas iniciais para reiniciar o deck
 var discard: Array = []
 var is_alive: bool = true
+var block: int = 0
 
 @onready var name_label: Label = $NameLabel
 @onready var health_bar: ProgressBar = $HealthBar
@@ -38,24 +39,16 @@ func setup_deck(cards: Array) -> void:
 	hand.clear()
 	discard.clear()
 
-func take_damage(amount: int, ignore_block := false) -> void:
-	var dmg = amount
+func take_damage(amount: int, ignore_block: bool = false) -> void:
+	var remaining_damage := amount
 	if not ignore_block and block > 0:
-		var absorbed = mini(block, dmg)
-		block -= absorbed
-		dmg -= absorbed
-	current_health = clampi(current_health - dmg, 0, max_health)
+		var blocked : int = min(block, remaining_damage)
+		block -= blocked
+		remaining_damage -= blocked
+	current_health = clampi(current_health - remaining_damage, 0, max_health)
 	if current_health <= 0 and is_alive:
 		is_alive = false
 		emit_signal("died", self)
-	_refresh()
-
-func add_block(amount: int) -> void:
-	block = maxi(0, block + amount)
-	_refresh()
-
-func reset_block() -> void:
-	block = 0
 	_refresh()
 
 func heal(amount: int) -> void:
@@ -68,11 +61,21 @@ func gain_energy(amount: int) -> void:
 	current_energy = clampi(current_energy + amount, 0, max_energy)
 	_refresh()
 
-func can_afford(cost: int) -> bool:
-	return current_energy >= cost
+func can_afford(amount: int) -> bool:
+	return current_energy >= amount
 
 func spend_energy(amount: int) -> void:
 	current_energy = clampi(current_energy - amount, 0, max_energy)
+	if current_energy == 0:
+		current_energy = max_energy
+	_refresh()
+
+func add_block(amount: int) -> void:
+	block = max(0, block + amount)
+	_refresh()
+
+func reset_block() -> void:
+	block = 0
 	_refresh()
 
 func draw_random_card() -> String:
