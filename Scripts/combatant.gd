@@ -66,8 +66,8 @@ func can_afford(amount: int) -> bool:
 
 func spend_energy(amount: int) -> void:
 	current_energy = clampi(current_energy - amount, 0, max_energy)
-	if current_energy == 0:
-		current_energy = max_energy
+	#if current_energy == 0:
+		#current_energy = max_energy
 	_refresh()
 
 func add_block(amount: int) -> void:
