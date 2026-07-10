@@ -102,7 +102,8 @@ func _setup_combatants() -> void:
 	]
 	player_combatant.setup_deck(player_cards)
 	cpu_combatant.setup_deck(cpu_cards)
-	cpu_combatant.setup_ai(1)
+	cpu_combatant.setup_ai(cpu_combatant.cpu_pick_assertiveness)
+	print(cpu_combatant.cpu_pick_assertiveness)
 	for _i in range(MAX_HAND_SIZE):
 		deck_node.draw_card()
 		draw_cpu_card()
@@ -800,6 +801,7 @@ func _end_battle(winner, loser) -> void:
 
 # Tela de fim de jogo: vitoria/derrota + botao de voltar ao menu (estilo dos menus).
 func _on_battle_ended(winner, _loser) -> void:
+	GameState.resolve_match(winner == player_combatant)
 	if winner == player_combatant:
 		_show_end_screen("VOCÊ VENCEU")
 	else:
