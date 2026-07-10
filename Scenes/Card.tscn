@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://ceh6bjt1cthey" path="res://Scripts/Card.gd" id="1_hael8"]
 [ext_resource type="PackedScene" uid="uid://c42ugbp5qag2k" path="res://Scenes/CardImage.tscn" id="2_cardimage"]
 [ext_resource type="Texture2D" uid="uid://di1tursqm0g2v" path="res://Assets/Back.png" id="3_h8wm0"]
+[ext_resource type="Texture2D" uid="uid://blae6trogj0g0" path="res://Assets/Cards/Bases/sem borda.png" id="4_shadow"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hael8"]
 size = Vector2(150, 200)
@@ -119,6 +120,13 @@ _data = {
 [node name="Card" type="Node2D" unique_id=538932331]
 position = Vector2(150, 950)
 script = ExtResource("1_hael8")
+
+[node name="Shadow" type="Sprite2D" parent="." unique_id=657483921]
+z_index = -2
+position = Vector2(4, 6)
+scale = Vector2(0.66, 0.66)
+modulate = Color(0, 0, 0, 0.35)
+texture = ExtResource("4_shadow")
 
 [node name="CardImageBack" type="Sprite2D" parent="." unique_id=557772291]
 visible = false

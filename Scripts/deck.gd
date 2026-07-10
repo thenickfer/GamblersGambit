@@ -16,4 +16,5 @@ func _refresh_label() -> void:
 	var empty = remaining == 0
 	$Area2D/CollisionShape2D.disabled = empty
 	$Sprite2D.visible = not empty
+	$Shadow.visible = not empty
 	$RichTextLabel.visible = not empty
