@@ -1,0 +1,8 @@
+[gd_resource type="FontVariation" format=3 uid="uid://djw8ec52hrsni"]
+
+[ext_resource type="FontFile" uid="uid://cjf0rg7ma2ynq" path="res://Assets/fonts/SuperPixel-m2L8j.ttf" id="1_oj8xu"]
+[ext_resource type="FontFile" uid="uid://sn8e2l4o47iw" path="res://Assets/fonts/Snowbell-Wp4g9.ttf" id="2_4tklk"]
+
+[resource]
+fallbacks = Array[Font]([ExtResource("2_4tklk")])
+base_font = ExtResource("1_oj8xu")

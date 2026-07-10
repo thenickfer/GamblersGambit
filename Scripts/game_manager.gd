@@ -7,7 +7,7 @@ const CARD_SCENE_PATH = "res://Scenes/Card.tscn"
 const MAX_HAND_SIZE = 5
 
 const MENU_FONT = preload("res://Assets/fonts/SuperPixel-m2L8j.ttf")
-const MAIN_MENU_SCENE = "res://Scenes/main_menu.tscn"
+const OPPONENT_SELECT_SCENE = "res://Scenes/OponentTestScene.tscn"
 const TEXT_COLOR = Color(1, 0.95, 0.82, 1)
 const TEXT_HIGHLIGHT = Color(1, 0.78, 0.36, 1)
 
@@ -52,9 +52,8 @@ const SFX_BY_TYPE := {
 	CardDB.Action.DEBUFF:  "card_debuff",
 	CardDB.Action.ENERGY:  "card_energy",
 }
-# Pausas que dão "peso" à jogada (segundos). Ajuste ao gosto.
-const DELAY_BEFORE_EFFECT := 0.25  # carta encaixa no slot, respira, e então resolve
-const DELAY_AFTER_EFFECT := 0.45   # efeito/número ficam visíveis antes de passar o turno
+const DELAY_BEFORE_EFFECT := 0.25
+const DELAY_AFTER_EFFECT := 0.45
 
 enum BattleState { SETUP, PLAYER_TURN, CPU_TURN, ENDED }
 
@@ -73,8 +72,8 @@ var pending_turn_start := {}
 var _status_impl := {}
 # Energia gasta na carta que está sendo jogada (para efeitos com custo X, ex.: All In).
 var energy_spent_context: int = 0
-# True enquanto a jogada do jogador está resolvendo (respiro antes/depois do efeito).
-# Trava jogar uma segunda carta no meio da animação.
+# True enquanto a troca de cartas está resolvendo.
+# Trava jogar uma segunda carta no meio da resolução.
 var is_resolving: bool = false
 
 @onready var player_combatant: Combatant = $PlayerStats
@@ -88,6 +87,7 @@ var is_resolving: bool = false
 @onready var opponent_fx_label = $OpponentFxLabel
 @onready var player_status_label = $PlayerStatusLabel
 @onready var opponent_status_label = $OpponentStatusLabel
+@onready var skip_turn_button: Button = $SkipTurnButton
 
 func _ready() -> void:
 	for k in STATUSES:
@@ -96,11 +96,15 @@ func _ready() -> void:
 	player_combatant.died.connect(_on_combatant_died)
 	cpu_combatant.died.connect(_on_combatant_died)
 	battle_ended.connect(_on_battle_ended)
+	skip_turn_button.pressed.connect(_on_skip_turn_pressed)
+
+	cpu_combatant.cpu_pick_assertiveness = GameState.selected_cpu_assertiveness
 
 	_setup_combatants()
 	battle_state = BattleState.PLAYER_TURN
 	_refresh_turn_label()
 	_refresh_status_labels()
+	_refresh_skip_turn_button()
 
 	AudioManager.play_music("combat")
 
@@ -119,7 +123,7 @@ func _setup_combatants() -> void:
 	]
 	player_combatant.setup_deck(player_cards)
 	cpu_combatant.setup_deck(cpu_cards)
-	cpu_combatant.setup_ai(1)
+	cpu_combatant.setup_ai(cpu_combatant.cpu_pick_assertiveness)
 	for _i in range(MAX_HAND_SIZE):
 		deck_node.draw_card()
 		draw_cpu_card()
@@ -140,27 +144,49 @@ func try_play_player_card(card_node) -> Dictionary:
 	energy_spent_context = cost
 	_consume_cost_mods(player_combatant)  # antes dos efeitos: não consome o desconto que a própria carta criar
 
-	# A carta é aceita e encaixa no slot já (went_to_board = false). Os efeitos só
-	# resolvem depois de um respiro, dentro de _resolve_player_play (corrotina).
 	is_resolving = true
 	AudioManager.play_sfx("card_place")
-	_resolve_player_play(card_node)
+	call_deferred("_resolve_player_play", card_node, cost)
 	return {"accepted": true, "went_to_board": false}
 
-# Roteiro assíncrono da jogada do jogador: respira, resolve os efeitos (com SFX e
-# números subindo), respira de novo e então passa o turno.
-func _resolve_player_play(card_node) -> void:
+# Resolve a troca: a CPU mostra a carta junto; bloqueios dela entram antes
+# do dano do jogador; depois resolve o restante da carta da CPU.
+func _resolve_player_play(card_node, player_energy_spent: int) -> void:
+	var cpu_card_node = _prepare_cpu_response_card()
+	if battle_state == BattleState.ENDED:
+		player_combatant.add_to_discard(card_node.card_name)
+		is_resolving = false
+		return
+
 	await _delay(DELAY_BEFORE_EFFECT)
+
+	if cpu_card_node != null:
+		_show_cpu_card_preview(cpu_card_node.card_name)
+		AudioManager.play_sfx("card_place")
+		AudioManager.play_sfx(_card_sfx_key(cpu_card_node))
+		_run_card_effects(cpu_combatant, player_combatant, cpu_card_node, _filter_timing_effects(cpu_card_node.card_effects, true), int(cpu_card_node.get("energy_spent", 0)))
+
 	AudioManager.play_sfx(_card_sfx_key(card_node))
-	_process_card_play(player_combatant, cpu_combatant, card_node)
+	_process_card_play(player_combatant, cpu_combatant, card_node, player_energy_spent)
 	player_combatant.add_to_discard(card_node.card_name)
 	await _delay(DELAY_AFTER_EFFECT)
-	is_resolving = false
 	if _check_battle_end():
+		if cpu_card_node != null:
+			cpu_combatant.add_to_discard(cpu_card_node.card_name)
+		is_resolving = false
 		return
-	_end_player_turn()
 
-# Espera assíncrona simples (0 = não espera).
+	if cpu_card_node != null:
+		_run_card_effects(cpu_combatant, player_combatant, cpu_card_node, _filter_timing_effects(cpu_card_node.card_effects, false), int(cpu_card_node.get("energy_spent", 0)))
+		cpu_combatant.add_to_discard(cpu_card_node.card_name)
+		await _delay(DELAY_AFTER_EFFECT)
+		if _check_battle_end():
+			is_resolving = false
+			return
+
+	is_resolving = false
+	_end_exchange_turn()
+
 func _delay(seconds: float) -> void:
 	if seconds > 0.0:
 		await get_tree().create_timer(seconds).timeout
@@ -171,11 +197,11 @@ func _card_sfx_key(card) -> String:
 	var data: Dictionary = CardDB.CARDS.get(card.card_name, {})
 	return data.get("sfx", SFX_BY_TYPE.get(card.card_type, "card_attack"))
 
-func _process_card_play(source, target, card_node) -> bool:
+func _process_card_play(source, target, card_node, energy_spent: int = -1) -> bool:
 	var before_health: int = target.current_health
 	var before_source_health: int = source.current_health
 
-	run_effects(source, target, card_node, card_node.card_effects)
+	_run_card_effects(source, target, card_node, card_node.card_effects, energy_spent)
 
 	_show_health_delta(target, target.current_health - before_health)
 	_show_health_delta(source, source.current_health - before_source_health)
@@ -184,6 +210,22 @@ func _process_card_play(source, target, card_node) -> bool:
 	# a carta jogada sempre vai pro slot central/descarte; os efeitos de varios
 	# turnos ficam registrados e sao mostrados como texto nos StatusLabel
 	return false
+
+func _run_card_effects(source, target, card, effects: Array, energy_spent: int = -1) -> void:
+	var previous_energy_spent := energy_spent_context
+	if energy_spent >= 0:
+		energy_spent_context = energy_spent
+	run_effects(source, target, card, effects)
+	energy_spent_context = previous_energy_spent
+
+func _filter_timing_effects(effects: Array, early_only: bool) -> Array:
+	var filtered: Array = []
+	for effect_data in effects:
+		var kind := String(effect_data.get("kind", ""))
+		var is_early := kind == "block" or kind == "heal"
+		if is_early == early_only:
+			filtered.append(effect_data)
+	return filtered
 
 # Executa uma lista de efeitos no contexto (source, target, card). Ponto único
 # reusado por: jogada normal, chance, conditional, defer e tick de status.
@@ -203,8 +245,14 @@ func _end_player_turn() -> void:
 	battle_state = BattleState.CPU_TURN
 	_refresh_status_labels()
 	_refresh_turn_label()
+	_refresh_skip_turn_button()
 	if not _check_battle_end():
 		_cpu_take_turn()
+
+func _on_skip_turn_pressed() -> void:
+	if battle_state != BattleState.PLAYER_TURN or battle_state == BattleState.ENDED:
+		return
+	_end_player_turn()
 
 func _get_status_snapshot(combatant) -> Array:
 	var key := str(combatant.get_instance_id())
@@ -240,23 +288,54 @@ func _build_battle_context() -> Dictionary:
 		}
 	}
 
+func _prepare_cpu_response_card():
+	battle_state = BattleState.CPU_TURN
+	_refresh_skip_turn_button()
+	_apply_turn_start(cpu_combatant)
+	if _check_battle_end():
+		return null
+	if cpu_combatant.hand.is_empty():
+		draw_cpu_card()
+
+	battle_context_for_cpu = _build_battle_context()
+	var decision: int = cpu_combatant.take_action(battle_context_for_cpu)
+	var idx = clampi(decision, -1, cpu_combatant.hand.size() - 1)
+	if idx == -1:
+		return null
+
+	var card_name: String = cpu_combatant.hand[idx]
+	var card_node = _build_virtual_card(card_name)
+	var cost = _resolve_cost(cpu_combatant, card_node.card_cost)
+	if not cpu_combatant.can_afford(cost):
+		return null
+
+	cpu_combatant.hand.remove_at(idx)
+	cpu_combatant.spend_energy(cost)
+	card_node["energy_spent"] = cost
+	_consume_cost_mods(cpu_combatant)
+	return card_node
+
 func _cpu_take_turn() -> void:
 	if battle_state == BattleState.ENDED:
 		return
+	is_resolving = true
 	
 	_apply_turn_start(cpu_combatant)
 	if _check_battle_end():  # dano por turno (Sangramento) pode encerrar a batalha
+		is_resolving = false
 		return
 	if cpu_combatant.hand.is_empty():
 		draw_cpu_card()
 
 	# A CPU so pode jogar uma carta que consiga pagar com a energia atual.
 
+	battle_context_for_cpu = _build_battle_context()
 	var decision: int = cpu_combatant.take_action(battle_context_for_cpu)
 
 	var idx = clampi(decision, -1, cpu_combatant.hand.size()-1)
 	
 	if idx == -1:
+		is_resolving = false
 		_end_cpu_turn()
 		return
 
@@ -271,7 +350,6 @@ func _cpu_take_turn() -> void:
 	energy_spent_context = cost
 	_consume_cost_mods(cpu_combatant)
 
-	# Mesmo respiro da jogada do jogador: carta aparece, pausa, efeito resolve, pausa.
 	await _delay(DELAY_BEFORE_EFFECT)
 	AudioManager.play_sfx(_card_sfx_key(card_node))
 	var went_to_board = _process_card_play(cpu_combatant, player_combatant, card_node)
@@ -280,19 +358,10 @@ func _cpu_take_turn() -> void:
 	await _delay(DELAY_AFTER_EFFECT)
 
 	if _check_battle_end():
+		is_resolving = false
 		return
+	is_resolving = false
 	_end_cpu_turn()
-
-# Retorna o indice de uma carta aleatoria que a CPU consegue pagar, ou -1.
-func _pick_cpu_card_index() -> int:
-	var affordable: Array[int] = []
-	for i in range(cpu_combatant.hand.size()):
-		var base_cost = CardDB.CARDS[cpu_combatant.hand[i]].get("cost", 0)
-		if cpu_combatant.can_afford(_resolve_cost(cpu_combatant, base_cost)):
-			affordable.append(i)
-	if affordable.is_empty():
-		return -1
-	return affordable[randi_range(0, affordable.size() - 1)]
 
 func _end_cpu_turn() -> void:
 	turn_number += 1
@@ -301,6 +370,16 @@ func _end_cpu_turn() -> void:
 	_apply_turn_start(player_combatant)  # início do próximo turno do jogador
 	_check_battle_end()  # dano por turno pode matar o jogador no começo do turno
 	_refresh_turn_label()
+	_refresh_skip_turn_button()
+
+func _end_exchange_turn() -> void:
+	turn_number += 1
+	draw_cpu_card()
+	battle_state = BattleState.PLAYER_TURN
+	_apply_turn_start(player_combatant)
+	_check_battle_end()
+	_refresh_turn_label()
+	_refresh_skip_turn_button()
 
 func _build_virtual_card(card_name: String) -> Dictionary:
 	var data: Dictionary = CardDB.CARDS[card_name]
@@ -686,6 +765,8 @@ func get_attack_bonus(combatant) -> int:
 	return total
 
 func _on_combatant_died(_combatant) -> void:
+	if is_resolving:
+		return
 	_check_battle_end()
 
 func _check_battle_end() -> bool:
@@ -702,19 +783,28 @@ func _check_battle_end() -> bool:
 func _end_battle(winner, loser) -> void:
 	battle_state = BattleState.ENDED
 	turn_label.text = "Batalha Encerrada\nVencedor: %s" % winner.combatant_name
+	_refresh_skip_turn_button()
 	emit_signal("battle_ended", winner, loser)
 
 # Tela de fim de jogo: vitoria/derrota + botao de voltar ao menu (estilo dos menus).
 func _on_battle_ended(winner, _loser) -> void:
+	var player_won: bool = winner == player_combatant
 	AudioManager.fade_out_music(1.5)
-	if winner == player_combatant:
+	GameState.resolve_match(player_won)
+	if GameState.has_winning_coins():
+		AudioManager.play_sfx("victory")
+		_show_end_screen("VOCE VENCEU O JOGO", "Moedas: %d/%d" % [GameState.player_coins, GameState.WIN_COINS])
+	elif GameState.has_no_coins():
+		AudioManager.play_sfx("defeat")
+		_show_end_screen("GAME OVER", "Voce ficou sem moedas")
+	elif player_won:
 		AudioManager.play_sfx("victory")
 		_show_end_screen("VOCÊ VENCEU")
 	else:
 		AudioManager.play_sfx("defeat")
 		_show_end_screen("FIM DE JOGO")
 
-func _show_end_screen(message: String) -> void:
+func _show_end_screen(message: String, detail: String = "") -> void:
 	var layer := CanvasLayer.new()
 	layer.layer = 100
 	layer.process_mode = Node.PROCESS_MODE_ALWAYS
@@ -743,8 +833,19 @@ func _show_end_screen(message: String) -> void:
 	title.add_theme_constant_override("outline_size", 8)
 	vbox.add_child(title)
 
+	if detail != "":
+		var subtitle := Label.new()
+		subtitle.text = detail
+		subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		subtitle.add_theme_font_override("font", MENU_FONT)
+		subtitle.add_theme_font_size_override("font_size", 42)
+		subtitle.add_theme_color_override("font_color", TEXT_COLOR)
+		subtitle.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
+		subtitle.add_theme_constant_override("outline_size", 6)
+		vbox.add_child(subtitle)
+
 	var button := Button.new()
-	button.text = "VOLTAR AO MENU"
+	button.text = "VOLTAR AOS ADVERSARIOS"
 	button.flat = true
 	button.add_theme_font_override("font", MENU_FONT)
 	button.add_theme_font_size_override("font_size", 40)
@@ -763,7 +864,7 @@ func _show_end_screen(message: String) -> void:
 func _on_back_to_menu_pressed() -> void:
 	AudioManager.play_sfx("button_click")
 	get_tree().paused = false
-	get_tree().change_scene_to_file(MAIN_MENU_SCENE)
+	get_tree().change_scene_to_file(OPPONENT_SELECT_SCENE)
 
 func _refresh_turn_label() -> void:
 	var txt = "Turno: %d" % turn_number
@@ -774,3 +875,6 @@ func _refresh_turn_label() -> void:
 	if enemy_attack != 0:
 		txt += "\nAtaque inimigo: %+d" % enemy_attack
 	turn_label.text = txt
+
+func _refresh_skip_turn_button() -> void:
+	skip_turn_button.disabled = battle_state != BattleState.PLAYER_TURN

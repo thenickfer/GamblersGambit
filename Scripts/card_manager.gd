@@ -35,13 +35,14 @@ func start_drag(card):
 	card_being_dragged = card
 
 func finish_drag():
-	card_being_dragged.scale = PLAYED_CARD_SCALE
 	var card_slot_found = raycast_check_for_card_slot()
 	if card_slot_found and card_slot_found.is_player_slot:
 		var result = game_manager_reference.try_play_player_card(card_being_dragged)
 		if result.accepted:
 			player_hand_reference.remove_card_from_hand(card_being_dragged)
 			card_being_dragged.get_node("Area2D/CollisionShape2D").disabled = true
+			card_being_dragged.scale = PLAYED_CARD_SCALE
+			card_being_dragged.z_index = 1
 			if not result.went_to_board:
 				if card_slot_found.card_in_slot and is_instance_valid(card_slot_found.card_node):
 					card_slot_found.card_node.queue_free()

@@ -26,7 +26,7 @@ func _on_play_pressed() -> void:
 	var tween := create_tween()
 	tween.tween_property(fade_overlay, "color:a", 1.0, fade_duration)
 	tween.tween_callback(func() -> void:
-		get_tree().change_scene_to_file("res://Scenes/CardScene.tscn")
+		get_tree().change_scene_to_file("res://Scenes/OponentTestScene.tscn")
 	)
 
 

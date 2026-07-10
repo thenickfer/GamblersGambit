@@ -17,6 +17,7 @@ config/features=PackedStringArray("4.6", "Forward Plus")
 [autoload]
 
 AudioManager="*res://Scripts/audio_manager.gd"
+GameState="*res://Scripts/game_state.gd"
 
 [display]
 
